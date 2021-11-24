@@ -1,0 +1,242 @@
+<div fxLayout="row wrap" *ngIf="isTable">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <div fxLayout="row wrap">
+          <div fxFlex.gt-sm="60" fxFlex.gt-xs="60" fxFlex="60">
+            <mat-card-title>
+              Work Instructions
+            </mat-card-title>
+          </div>
+          <div fxFlex.gt-sm="30" fxFlex.gt-xs="30" fxFlex="30">
+            <mat-form-field>
+              <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+            </mat-form-field>
+          </div>
+          <div fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10">
+            <button mat-raised-button color="primary" class="pull-right"
+              (click)="isAdd = true;isTable = false">Add</button>
+          </div>
+        </div>
+        <div class="responsive-table">
+          <table mat-table [dataSource]="dataSource">
+
+            <!-- Position Column -->
+            <ng-container matColumnDef="Id">
+              <th mat-header-cell *matHeaderCellDef class="font"> ID </th>
+              <td mat-cell *matCellDef="let element"> {{element.Id}} </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="EstimatedTime">
+              <th mat-header-cell *matHeaderCellDef class="font"> Estimated Time </th>
+              <td mat-cell *matCellDef="let element"> {{element.EstimatedTime}} </td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="IsActive">
+              <th mat-header-cell *matHeaderCellDef class="font"> Status</th>
+              <td mat-cell *matCellDef="let element"> {{element.IsActive?'Active':'Inactive'}} </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="Link">
+              <th mat-header-cell *matHeaderCellDef class="font"> Link </th>
+              <td mat-cell *matCellDef="let element"> {{element.Link}} </td>
+            </ng-container>
+            <ng-container matColumnDef="SequenceNumber">
+              <th mat-header-cell *matHeaderCellDef class="font"> Sequence Number </th>
+              <td mat-cell *matCellDef="let element"> {{element.SequenceNumber}} </td>
+            </ng-container>
+            <ng-container matColumnDef="CATModelName">
+              <th mat-header-cell *matHeaderCellDef class="font"> CAT Model Name </th>
+              <td mat-cell *matCellDef="let element"> {{element.CATModelName}} </td>
+            </ng-container>
+            <ng-container matColumnDef="ActualTime">
+              <th mat-header-cell *matHeaderCellDef class="font"> Actual Time </th>
+              <td mat-cell *matCellDef="let element"> {{element.ActualTime}} </td>
+            </ng-container>
+            <ng-container matColumnDef="workStation">
+              <th mat-header-cell *matHeaderCellDef class="font"> workStation </th>
+              <td mat-cell *matCellDef="let element"> {{element.workStation}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Action">
+              <th mat-header-cell *matHeaderCellDef class="font">Action</th>
+              <td mat-cell *matCellDef="let element"><span><i class="material-icons" (click)="showUpdateForm(element)"
+                    style="color:green;cursor: pointer;"> edit</i><i class="material-icons"
+                    (click)="deleteWorkInstructions(element)" style="color:red;cursor: pointer;"> delete </i></span>
+              </td>
+            </ng-container>
+
+            <!-- Symbol Column -->
+
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+          <mat-paginator [pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+        </div>
+        <!-- <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator> -->
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+
+
+<div fxLayout="row wrap" *ngIf="isAdd">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>
+          Add Work Instructions
+        </mat-card-title>
+        <form [formGroup]="form" (ngSubmit)="AddWorkInstruction()">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Image" [(ngModel)]="workinstruction.Image"
+                      [formControl]="form.controls['Image']" name="Image">
+                  </mat-form-field>
+                  <small
+                  *ngIf="form.controls['Image'].hasError('required') && form.controls['Image'].touched"
+                  class="text-danger support-text">Image is required.</small>
+
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Description" [(ngModel)]="workinstruction.Description"
+                      [formControl]="form.controls['Description']" name="Description">
+                  </mat-form-field>
+                  <small
+                  *ngIf="form.controls['Description'].hasError('required') && form.controls['Description'].touched"
+                  class="text-danger support-text">Description is required.</small>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Link" [(ngModel)]="workinstruction.Link"
+                      [formControl]="form.controls['Link']" name="Link">
+                  </mat-form-field>
+                  <small
+                  *ngIf="form.controls['Link'].hasError('required') && form.controls['Link'].touched"
+                  class="text-danger support-text">Link is required.</small>
+                </div>
+
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="SequenceNumber" [(ngModel)]="workinstruction.SequenceNumber"
+                      [formControl]="form.controls['SequenceNumber']" name="SequenceNumber">
+                  </mat-form-field>
+                  <small
+                  *ngIf="form.controls['SequenceNumber'].hasError('required') && form.controls['SequenceNumber'].touched"
+                  class="text-danger support-text">SequenceNumber is required.</small>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="EstimatedTime" [(ngModel)]="workinstruction.EstimatedTime"
+                      [formControl]="form.controls['EstimatedTime']" name="EstimatedTime">
+                  </mat-form-field>
+                  <small
+                  *ngIf="form.controls['EstimatedTime'].hasError('required') && form.controls['EstimatedTime'].touched"
+                  class="text-danger support-text">EstimatedTime is required.</small>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="ActualTime" [(ngModel)]="workinstruction.ActualTime"
+                      [formControl]="form.controls['ActualTime']" name="ActualTime">
+                  </mat-form-field>
+                  <small
+                  *ngIf="form.controls['ActualTime'].hasError('required') && form.controls['ActualTime'].touched"
+                  class="text-danger support-text">ActualTime is required.</small>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Model Name</mat-label>
+                    <mat-select [(ngModel)]="workinstruction.CATModelName" [formControl]="form.controls['CATModelName']"
+                      name="CATModelName">
+                      <mat-option *ngFor="let cm of calmodellist" [value]="cm.modelName">
+                        {{cm.modelName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <small
+                  *ngIf="form.controls['CATModelName'].hasError('required') && form.controls['CATModelName'].touched"
+                  class="text-danger support-text">CATModelName is required.</small>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Work Station Name</mat-label>
+                    <mat-select [(ngModel)]="workinstruction.WorkStationName"
+                      [formControl]="form.controls['WorkStationName']" name="WorkStationName">
+                      <mat-option *ngFor="let cm of calstationlist" [value]="cm.WorkStationName">
+                        {{cm.WorkStationName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <small
+                  *ngIf="form.controls['WorkStationName'].hasError('required') && form.controls['WorkStationName'].touched"
+                  class="text-danger support-text">WorkStationName is required.</small>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Annotation Number</mat-label>
+                    <mat-select [(ngModel)]="workinstruction.Id" [formControl]="form.controls['Id']" name="Id">
+                      <mat-option *ngFor="let cm of calannotationlist" [value]="cm.id">
+                        {{cm.id}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <small
+                  *ngIf="form.controls['Id'].hasError('required') && form.controls['Id'].touched"
+                  class="text-danger support-text">Id is required.</small>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right"
+                    style="margin-left:10px">Save</button>
+                  <button mat-raised-button color="warn" type="button" class="pull-right"
+                    (click)="isAdd = false;isTable = true">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap" *ngIf="isEdit">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Edit workinstruction</mat-card-title>
+        <form (ngSubmit)="UpdateWorkInstruction()">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="workinstruction" [(ngModel)]="editworkinstruction.CATModelName"
+                      name="plantName">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right"
+                    style="margin-left:10px">Update</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isTable = true; isEdit = false">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

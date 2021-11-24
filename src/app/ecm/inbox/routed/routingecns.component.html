@@ -1,0 +1,265 @@
+<div fxLayout="row wrap" *ngIf="isTable">
+  <div fxFlex.gt-md=100 fxFlex.gt-sm=100 fxFlex.gt-xs=100 fxFlex=100>
+    <mat-card>
+      <mat-card-content>
+        <div class="mat-elevation-z8" style="overflow: auto;">
+          <mat-paginator [length]="routedList.length" [pageSizeOptions]="[10,20,50,100]" showFirstLastButtons>
+          </mat-paginator>
+
+          <table mat-table [dataSource]="dataSource" matSort>
+
+            <ng-container matColumnDef="ECRNumber">
+              <th style="width:auto" mat-header-cell *matHeaderCellDef> ECR Number</th>
+              <td style="width:auto" mat-cell *matCellDef="let element"><a (click)="showUpdateForm(element)"
+                  style="text-decoration: underline;color: blue; cursor: pointer;">
+                  {{element.EChangeRecord.ECRNumber}}</a> </td>
+            </ng-container>
+
+            <ng-container matColumnDef="ECRRelease">
+              <th style="width:auto" mat-header-cell *matHeaderCellDef> ECR Release </th>
+              <td style="width:auto" mat-cell *matCellDef="let element"> {{element.EChangeRecord.ECRRelease}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="EcmStatus">
+              <th style="width:auto" mat-header-cell *matHeaderCellDef> ECRS Status </th>
+              <td style="width:auto" mat-cell *matCellDef="let element"> {{element.EChangeRecord.Status}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Version">
+              <th style="width:auto" mat-header-cell *matHeaderCellDef> Version </th>
+              <td style="width:auto" mat-cell *matCellDef="let element"> {{element.EChangeRecord.Version}} </td>
+            </ng-container>
+
+
+
+            <ng-container matColumnDef="RoutedBy">
+              <th style="width:auto" mat-header-cell *matHeaderCellDef> Routed By </th>
+              <td style="width:auto" mat-cell *matCellDef="let element"> {{element.RoutedBy.UserName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="DateTime">
+              <th style="width:auto" mat-header-cell *matHeaderCellDef mat-sort-header> Date Time </th>
+              <td style="width:auto" mat-cell *matCellDef="let element"> {{element.CurrentTimeStamp}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="RejectedUser">
+              <th style="width:auto" mat-header-cell *matHeaderCellDef> Rejected User </th>
+              <td style="width:auto" mat-cell *matCellDef="let element"> {{element.RejectedUser}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="ReworkComments">
+              <th style="width:auto" mat-header-cell *matHeaderCellDef> Rework Comments </th>
+              <td style="width:auto" mat-cell *matCellDef="let element"> {{element.CurrentRejectedComments.Comments}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row" *ngIf="isEdit">
+  <div fxFlex.gt-md=100 fxFlex.gt-sm=100 fxFlex.gt-xs=100 fxFlex=100>
+    <mat-card style="padding: 0px;margin: 10px;">
+      <mat-card-content style="padding: 0px; margin:10px;">
+        <app-ecrcreation [data]="ecr"></app-ecrcreation>
+        <div>
+          <a role="button" (click)="downloadFiles(ecr.Files)"
+            style="margin:20px;text-decoration: underline;color: blue; cursor: pointer;font-weight: bold;">{{ecr.Files}}</a>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div fxFlex.gt-md=100 fxFlex.gt-sm=100 fxFlex.gt-xs=100 fxFlex=100>
+    <mat-card style="padding: 0px;margin: 5px;">
+      <mat-card-content style="padding: 0px;margin: 10px;">
+        <div fxLayout = "row" style="padding:1rem 0rem 0rem 1rem;">
+          <h3 style="margin: 0px; font-weight: bold;width:30%">Department</h3>
+          <h3 style="margin: 0px; background-color:lightgoldenrodyellow" *ngFor="let model of DepartmentList"> {{model.DepartmentName }}</h3>
+          <!-- <mat-list role="list" style="padding: 0;margin:0">
+            <mat-list-item style="padding: 0;margin:0" role="listitem" *ngFor="let model of DepartmentList"> {{model.DepartmentName }}</mat-list-item>
+          </mat-list> -->
+        </div>
+        <div fxLayout = "column" style="padding:1rem 0rem 0rem 1rem;">
+          <h3 style="margin: 0px; font-weight: bold;">Processes</h3>
+          <!-- <mat-list role="list" style="padding: 0;margin:0"> -->
+            <div style="padding: 0;margin:0" role="listitem" *ngFor="let model of dataProcess">
+              <table  style="padding: 0;margin:0">
+                <td style="width:auto" style="width: 15%">
+                    {{model.Process.ProcessName}}
+                </td>
+                <td style="width:auto" style="width: 20%">
+                    {{model.Status}}
+                </td>
+                <td style="width:auto" style="width: 10%">
+                  <a (click)="download(model)"
+                  style="text-decoration: underline;color: blue; cursor: pointer;">{{model.Files}}</a>
+                </td>
+                </table>
+            </div>
+          <!-- </mat-list> -->
+        </div>
+        
+        <!-- <div  fxLayout="row" fxLayoutAlign="space-around center" > -->
+          <!-- <h3 style="margin: 0px; font-weight: bold;width:30%;">Process Lists</h3> -->
+            
+        <!-- </div> -->
+
+
+        <div fxLayout = "column"  style="padding:0rem 0rem 0rem 1rem;">
+            <h3 style="font-weight:bold;padding: 0;margin: 0" >{{processLists.processName}}</h3>
+            <button  *ngIf="isEcr" style="width:40%;padding-top:10px " mat-raised-button color="primary" (click)="isAddECM = true;isTable = false;isEdit=false;assign()">
+              Add Work Instructions
+            </button>
+        </div>
+        <ul>
+          <li *ngFor="let model of processLists.checkList ">
+            <div fxLayout="row" fxLayoutAlign="space-around center" >
+              <label style="width: 30%">{{model.CheckPoints}}</label>
+              <div style="width: 70%" class="custom-select">
+                <select id="selecvalue" (change)="selected_Group($event.srcElement,model,id)">
+                  <option selected="true" disabled="disabled">--Choose option--</option>
+                  <option value="passed">PASSED</option>
+                  <option>NA</option>
+                </select>
+              </div>
+            </div>
+
+          </li>
+        </ul>
+
+        <div style="padding:0rem 0rem 0rem 1rem;">
+            <mat-label>Select Files</mat-label><br>
+            <input type="file" (change)="onFileChanged($event)">
+        </div>
+        
+
+        <div style="padding:1rem 0rem 0rem 1rem;">
+          <button mat-raised-button color="primary" 
+            (click)="isApprove=true;getApprove();getRouting();isTable=true;isEdit=false">Accept</button>
+          <button mat-raised-button color="warn"  (click)="getApproveReject();">Reject</button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap" *ngIf="isAddECM">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Add ECR </mat-card-title>
+        <form #addForm="ngForm" (ngSubmit)="addEcr(addForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Ecr Number</mat-label>
+                    <input matInput placeholder="EcrNumber"  [(ngModel)]="ecrImpl.EcrNumber" name="ecrnumber"
+                      required>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="ecrImpl.SectionName" (ngModelChange)="getModels()" name="SectionName"
+                      required>
+                      <mat-option *ngFor="let section of SectionList" [value]="section">
+                        {{section}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Model</mat-label>
+                    <mat-select [(ngModel)]="ecrImpl.ModelName" name="ModelName" (ngModelChange)="getComponents()"
+                      required>
+                      <mat-option *ngFor="let model of modelList" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Area</mat-label>
+                    <mat-select [(ngModel)]="ecrImpl.AreaName" name="AreaName" required
+                      (ngModelChange)="getComponents()" multiple>
+                      <mat-option *ngFor="let area of areaList" [value]="area" required>
+                        {{area}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Component</mat-label>
+                    <mat-select [(ngModel)]="ecrImpl.ComponentName" name="ComponentName" required>
+                      <mat-option *ngFor="let component of componentList" [value]="component" required>
+                        {{component}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-label>Image Upload</mat-label><br>
+                  <div *ngIf="isSpinnerImage">
+                    <mat-spinner></mat-spinner>
+                  </div>
+                  <input type="file" (change)="onFileChangedEcr($event)" accept=".jpg" multiple required>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <br>
+                  <mat-label>Excel File Upload</mat-label><br>
+                  <input type="file" (change)="onFileChangedCsv($event)" accept=".xlsx" multiple required>
+                </div>
+
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button type="submit" class="pull-right" id="save" style="margin-left:10px"
+                    color="primary">Save</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isAddECM= !isAddECM;isTable = true;getRouting();addForm.resetForm();">Cancel</button>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+                    <a href="assets/images/readme.txt" download="readme.txt" title="readme"><span>
+                        <pre>Read me before Add Ecr!</pre></span></a>
+                  </div>
+
+                  <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+                    <a href="https://caterpillarwi-webapi.azurewebsites.net/api/admin/ProcedureTemplate" title="Sample Template">
+                      <span>
+                        <pre>Add Ecr - Sample Template</pre></span></a>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </form>
+          <mat-label *ngIf="isSpinner">{{progressMessage}}</mat-label>
+          <mat-progress-bar mode="determinate" *ngIf="isSpinner" [value] ="progressvalue" ></mat-progress-bar>
+      </mat-card-content>
+
+    </mat-card>
+  </div>
+</div>

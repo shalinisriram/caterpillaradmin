@@ -1,0 +1,80 @@
+<mat-card> 
+  <mat-card-content>
+    <div fxLayout="column">
+      <div fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10">
+        <h3>ECR Number</h3>
+      </div>
+
+      <div fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10">
+        <h3>Affected Zoones</h3>
+      </div>
+
+      <div fxFlex.gt-sm="*" fxFlex.gt-xs="*" fxFlex="*">
+        <div fxLayout="row wrap" >
+
+          <div fxFlex.gt-sm="45" fxFlex.gt-xs="45" fxFlex="45">
+            <h4>Department</h4>
+            <mat-form-field class="p-r-10" >
+              <mat-label>Requested By</mat-label>
+              <mat-select [(ngModel)]="department" name="department">
+                <mat-option *ngFor="let model of Database" [value]="model" >
+                  {{model}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          
+              <button matTooltip="Default"  mat-icon-button 
+              class="pull-right" (click)="getDepartmentList()">
+                  <mat-icon>add</mat-icon>
+                </button>
+              <button mat-button style="margin-left:10px" class="pull-right" (click)="deleteDepartment()"
+                id="deleteButton"> <mat-icon>delete</mat-icon>
+              </button>
+              <div>
+                <br>
+              </div>
+
+              <section *ngFor="let item of Departmentlist" >
+                <mat-checkbox  [value]="item" [(ngModel)]="departmentSelect"  >
+                 {{ item }}<br>
+                </mat-checkbox>
+              </section>
+          </div>
+
+          <div fxFlex.gt-sm="5" fxFlex.gt-xs="5" fxFlex="5"></div>
+
+          <div fxFlex.gt-sm="45" fxFlex.gt-xs="45" fxFlex="45" >
+            <h4>Operation</h4>
+            <mat-form-field class="p-r-10" >
+              <mat-label>Requested By</mat-label>
+              <mat-select  [(ngModel)]="operation" name="operation">
+                <mat-option *ngFor="let model of Database" [value]="model">
+                  {{model}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button matTooltip="Default"  mat-icon-button 
+              class="pull-right" (click)="getOperationList()">
+                  <mat-icon>add</mat-icon>
+                </button>
+              <button mat-button style="margin-left:10px" class="pull-right" (click)="deleteOperation()"
+                id="deleteButton"> <mat-icon>delete</mat-icon>
+              </button>
+              <div>
+                <br>
+              </div>
+              
+              <section *ngFor="let item of OpertionList" >
+                <mat-checkbox  [value]="item">
+                 {{ item }}<br>
+                </mat-checkbox>
+              </section>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </mat-card-content>
+</mat-card>
+ 

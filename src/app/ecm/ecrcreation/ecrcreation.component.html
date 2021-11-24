@@ -1,0 +1,202 @@
+<div fxLayout="row" style=" background-color: whites;">
+  <div style="width:100%">
+    <mat-card style="padding: 0px;margin: 5px;">
+      <mat-card-content style="padding: 2px; margin:10px;">
+        <mat-card-title>ECR Creation</mat-card-title>
+        <form #ecrform [formGroup]="form" class="example-form" style="width:100%">
+          <fieldset  [ngStyle]="{'pointer-events':ecr.isDisable ? 'none' : 'auto' }">
+          <div fxLayout="row" >
+            <div fxFlex="50" style="padding:1%;margin:1%">
+               <mat-form-field  class="example-full-width">
+              <mat-label>ECR Number</mat-label>
+              <input  matInput [(ngModel)]="ecr.ECRNumber" [formControl]="form.controls['ECRNumber']" name="ECRNumber"
+                required>
+              <small *ngIf="form.controls['ECRNumber'].hasError('required') && form.controls['ECRNumber'].touched"
+                class="text-danger support-text">ECRNumber is required.</small>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Description</mat-label>
+              <textarea matInput rows="5" cols="40" [(ngModel)]="ecr.Description" name="Description"
+                [formControl]="form.controls['Description']" required></textarea>
+              <small *ngIf="form.controls['Description'].hasError('required') && form.controls['Description'].touched"
+                class="text-danger support-text">Description is required.</small>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Effective Date</mat-label>
+              <input matInput [matDatepicker]="picker1" [(ngModel)]="ecr.EffectiveDate" name="EffectiveDate"
+                [formControl]="form.controls['EffectiveDate']">
+              <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+              <mat-datepicker #picker1></mat-datepicker>
+
+            </mat-form-field>
+
+            <mat-form-field class="example-full-width">
+              <mat-label>Effected Serial Number</mat-label>
+              <input matInput [(ngModel)]="ecr.SerialNumber" [formControl]="form.controls['SerialNumber']"
+                name="SerialNumber">
+            </mat-form-field>
+
+
+            <mat-form-field class="example-full-width">
+              <mat-label>Part Number</mat-label>
+              <input matInput [(ngModel)]="ecr.PartNumber" name="PartNumber" required
+                [formControl]="form.controls['PartNumber']">
+              <small *ngIf="form.controls['PartNumber'].hasError('required') && form.controls['PartNumber'].touched"
+                class="text-danger support-text">PartNumber is required.</small>
+            </mat-form-field>
+
+            </div>
+            <div fxFlex="50" style="padding:1%;margin:1%">
+            <mat-form-field class="example-full-width">
+              <mat-label>Revision Number</mat-label>
+              <input matInput [(ngModel)]="ecr.RevisionNumber" name="RevisionNumber" required
+                [formControl]="form.controls['RevisionNumber']">
+              <small
+                *ngIf="form.controls['RevisionNumber'].hasError('required') && form.controls['RevisionNumber'].touched"
+                class="text-danger support-text">RevisionNumber is required.</small>
+            </mat-form-field>
+
+
+            <mat-form-field class="example-full-width">
+              <mat-label>Requested By</mat-label>
+              <input type="text" aria-label="Number" matInput [formControl]="form.controls['RequestedBy']"
+                [matAutocomplete]="auto" [(ngModel)]="ecr.RequestedBy" name="RequestedBy" required>
+              <mat-autocomplete #auto="matAutocomplete">
+                <mat-option *ngFor="let option of Database" [value]="option">
+                  {{option}}
+                </mat-option>
+              </mat-autocomplete>
+              <small *ngIf="form.controls['RequestedBy'].hasError('required') && form.controls['RequestedBy'].touched"
+                class="text-danger support-text">Requested is required.</small>
+            </mat-form-field>
+            
+            
+           
+
+
+            <mat-form-field class="example-full-width">
+              <mat-label>CatJob Number</mat-label>
+              <input matInput [(ngModel)]="ecr.CatJobNumber" name="CatJobNumber" required
+                [formControl]="form.controls['CatJobNumber']">
+              <small *ngIf="form.controls['CatJobNumber'].hasError('required') && 
+          form.controls['CatJobNumber'].touched" class="text-danger support-text">CatJobNumber is required.</small>
+            </mat-form-field>
+
+            <mat-form-field class="p-r-10">
+              <mat-label>ECR Type</mat-label>
+              <mat-select [(ngModel)]="ecr.ECRType" name="ECRType" required [formControl]="form.controls['ECRType']">
+                <mat-option *ngFor="let model of types" [value]="model">
+                  {{model}}
+                </mat-option>
+              </mat-select>
+              <small *ngIf="form.controls['ECRType'].hasError('required') && form.controls['ECRType'].touched"
+                class="text-danger support-text">Type is required.</small>
+            </mat-form-field>
+
+            <mat-label>Select Files</mat-label><br>
+            <input type="file" (change)="onFileChanged($event)">
+            <br>
+            <div style="height:50px"></div>
+            <button mat-raised-button color="warn" class="pull-right"
+            (click)="getInbox()">Cancel</button>
+        
+            <button mat-raised-button color="primary" type="submit" class="pull-right" id="save"
+              style="margin-left:10px" [disabled]="!form.valid" (click)="getSaveEcrForm()">Save</button>
+            <button mat-raised-button color="primary" type="submit" class="pull-right" style="margin-left:10px"
+              [disabled]="!form.valid"
+              (click)="isEcrRouting = !isEcrRouting;isEcrForm = !isEcrForm ;getSubmit()">Submit</button>
+
+          </div>
+          </div>
+
+          </fieldset>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div  *ngIf="isEcrRouting"style="width: 40%"> 
+    <mat-card style="padding: 0px;margin: 5px;">
+      <mat-card-content style="padding: 2px;margin: 10px;">
+        <mat-card-title> Affected Zones</mat-card-title>
+
+        <div>
+          <div>
+            <h4 style="margin: 0px;">Department</h4>
+            <mat-radio-group class="tp-radio-group"  [(ngModel)]="ecrrouting.Depts">
+              <mat-radio-button class="tp-radio-button" style="padding:2px" *ngFor="let season of Departmentlist"
+                [value]="season.DepartmentName">
+                {{season.DepartmentName}}<br>
+              </mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+
+          <div>
+            <h4 style="margin: 0px;">Section</h4>
+            <mat-radio-group class="tp-radio-group" [(ngModel)]="ecrrouting.Section">
+              <mat-radio-button class="tp-radio-button" style="padding:2px"  *ngFor="let season of SectionList" [value]="season">
+                {{season}}
+              </mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+          <div>
+            <h4 style="margin: 5px;">Operation</h4>
+            <ul>
+                <li *ngFor="let model of process ; let i = index" [value]="model.Process">
+                    <label>
+                        <input type="checkbox" name="Process" id="{{i}}" (change)="selected_chart($event.srcElement,model.Process)" /> {{model.Process}}</label>
+                    <ul>
+                        <li *ngFor="let season of model.Groups" >
+                            <label> 
+                                <input type="checkbox" name ="Group" (change)="selected_Group($event.srcElement,model.Process,i,season)" /> {{season}}</label>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <!-- <mat-list >
+
+            </mat-list>
+            <mat-selection-list [(ngModel)]="routingGroupPr" >
+              <mat-list-option style="padding: 2px" >
+                {{model.Process}}
+                <div *ngFor="let season of model.Groups">
+                    <mat-radio-button color="primary" [value]="season">
+                        {{season}}
+                    </mat-radio-button>
+                </div>
+                                <mat-list>
+                    <mat-list-item  *ngFor="let season of model.Groups">
+                        <mat-radio-button color="primary" [value]="season">
+                            {{season}}
+                        </mat-radio-button>
+                      </mat-list-item>
+                    </mat-list> -->
+                     <!-- <mat-radio-group class = "tp-radio-group" [(ngModel)] = "routingGroup.Groups"> -->
+                  <!-- <mat-radio-button style="padding: 2px" class="tp-radio-button" *ngFor="let season of model.Groups"
+                    [value]="season">
+                    {{season}}
+                  </mat-radio-button>
+                  </mat-radio-group> -->
+
+                
+
+              <!-- </mat-list-option>
+            </mat-selection-list> --> 
+          </div>
+        </div>
+
+        <div>
+          <button mat-raised-button color="primary" style="margin: 10px;" class="pull-right"
+            (click)="isEcrRouting = false;isEcrForm = true;processListRout();getInbox()">Route To</button>
+        </div>
+            <div style="height:50px">
+            </div>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

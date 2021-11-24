@@ -1,0 +1,50 @@
+<ng4-loading-spinner [loadingText]="'Uploading...'"></ng4-loading-spinner>
+<div class="main-container">
+    <mat-toolbar color="primary" class="topbar telative" style="background:#fff">
+        <div class="navbar-header">
+            <!-- <a class="navbar-brand" target="_blank" href="https://www.axiscades.com">
+                <span fxShow="false" fxShow.gt-xs>
+                    <img src="assets/images/axiscades.png" alt="homepage" class="dark-logo">
+                    <img src="assets/images/axiscades.png" class="light-logo" alt="homepage">
+                </span>
+            </a> -->
+            <button mat-icon-button class="pull-left" (click)="snav.toggle()" value="sidebarclosed">
+                <mat-icon style="color: black">menu</mat-icon>
+            </button>
+        </div>
+        
+        <span fxFlex></span>
+        <!-- <div class="navbar-header">
+            <a class="navbar-brand" target="_blank" href="https://www.caterpillar.com/en.html">
+                <span fxShow="false" fxShow.gt-xs>
+                    <img src="assets/images/logo.png" class="light-logo" alt="homepage">
+                </span>
+            </a>
+        </div> -->
+
+        <app-header></app-header>
+        <span fxShow="false" fxShow.gt-xs>
+            <h1 style="color:black;font-weight: bold;width:100%;text-transform: uppercase">
+                {{currentUser}}</h1>
+        </span>
+    </mat-toolbar>
+    <mat-sidenav-container class="example-sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 0 : 0"
+    [ngClass]="{'minisidebar': minisidebar}">
+    <mat-sidenav #snav id="snav" class="pl-xs" [mode]="mobileQuery.matches ? 'side' : 'over'" fixedTopGap="0"
+        [opened]="mobileQuery.matches" [disableClose]="mobileQuery.matches" (open)="sidebarOpened = true"
+        (close)="sidebarOpened = false">
+           
+            <app-sidebar ></app-sidebar>
+            
+        </mat-sidenav>
+        <mat-sidenav-content class="page-wrapper">
+            <div class="page-content" style="padding: 0px;">
+                <router-outlet>
+
+                </router-outlet>
+            </div>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
+    
+    
+</div>

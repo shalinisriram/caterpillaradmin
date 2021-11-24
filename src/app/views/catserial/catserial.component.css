@@ -1,0 +1,22 @@
+table {
+    width: 100%;
+  }
+
+  td, th {
+    width: 18%;
+  }
+  .font{
+    font-size: 14px;
+    font-weight: 500;
+  }  
+  .mat-cell {
+    padding: 2px;
+    text-align: left;
+    border-right: 1px solid lightgray;
+}
+.mat-header-cell {
+  background-color: lightgray;
+  font-weight: bold;
+  font-size: 15px;
+  width:100%
+}

@@ -1,0 +1,228 @@
+<div fxLayout="row wrap" *ngIf="isTable">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <div fxLayout="row wrap">
+          <div fxFlex.gt-sm="60" fxFlex.gt-xs="60" fxFlex="60">
+            <mat-card-title>
+              Annotations
+
+            </mat-card-title>
+          </div>
+          <div fxFlex.gt-sm="30" fxFlex.gt-xs="30" fxFlex="30">
+            <mat-form-field>
+              <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+            </mat-form-field>
+          </div>
+          <div fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10">
+            <button mat-raised-button color="primary" class="pull-right"
+              (click)="isAdd = true;isTable = false">Add</button>
+          </div>
+        </div>
+        <div class="responsive-table">
+          <table mat-table [dataSource]="dataSource" >
+
+            <!-- Position Column -->
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef class="font"> ID</th>
+              <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+            </ng-container>
+            <ng-container matColumnDef="backgroundColor">
+              <th mat-header-cell *matHeaderCellDef class="font"> Background Color</th>
+              <td mat-cell *matCellDef="let element"> {{element.backgroundColor}} </td>
+            </ng-container>
+            <ng-container matColumnDef="color">
+              <th mat-header-cell *matHeaderCellDef class="font"> Color</th>
+              <td mat-cell *matCellDef="let element"> {{element.color}} </td>
+            </ng-container>
+            <ng-container matColumnDef="height">
+              <th mat-header-cell *matHeaderCellDef class="font"> height</th>
+              <td mat-cell *matCellDef="let element"> {{element.height}} </td>
+            </ng-container>
+            <ng-container matColumnDef="isDeleted">
+              <th mat-header-cell *matHeaderCellDef class="font"> isDeleted</th>
+              <td mat-cell *matCellDef="let element"> {{element.isDeleted}} </td>
+            </ng-container>
+            <ng-container matColumnDef="recordInfoId">
+              <th mat-header-cell *matHeaderCellDef class="font"> recordInfoId</th>
+              <td mat-cell *matCellDef="let element"> {{element.recordInfoId}} </td>
+            </ng-container>
+            <ng-container matColumnDef="text">
+              <th mat-header-cell *matHeaderCellDef class="font"> text</th>
+              <td mat-cell *matCellDef="let element"> {{element.text}} </td>
+            </ng-container>
+            <ng-container matColumnDef="width">
+              <th mat-header-cell *matHeaderCellDef class="font"> width</th>
+              <td mat-cell *matCellDef="let element"> {{element.width}} </td>
+            </ng-container>
+             <!-- Name Column -->
+            <ng-container matColumnDef="workInstructionId">
+              <th mat-header-cell *matHeaderCellDef class="font"> Work Instruction ID </th>
+              <td mat-cell *matCellDef="let element"> {{element.workInstructionId}} </td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="isActive">
+              <th mat-header-cell *matHeaderCellDef class="font"> Status </th>
+              <td mat-cell *matCellDef="let element"> {{element.isActive?'Active':'Inactive'}} </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="positionX">
+              <th mat-header-cell *matHeaderCellDef class="font"> Position X </th>
+              <td mat-cell *matCellDef="let element"> {{element.positionX}} </td>
+            </ng-container>
+            <ng-container matColumnDef="positionY">
+              <th mat-header-cell *matHeaderCellDef class="font"> Position Y </th>
+              <td mat-cell *matCellDef="let element"> {{element.positionY}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Action">
+              <th mat-header-cell *matHeaderCellDef class="font">Action</th>
+              <td mat-cell *matCellDef="let element"><span><i class="material-icons" (click)="showUpdateForm(element)"
+                    style="color:green;cursor: pointer;"> edit</i><i class="material-icons"
+                    (click)="deleteAnnotation(element)" style="color:red;cursor: pointer;"> delete </i></span></td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+          <mat-paginator [pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+
+
+<div fxLayout="row wrap" *ngIf="isAdd">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>
+          Add Annotations
+        </mat-card-title>
+        <form (ngSubmit)="addannotations()" [formGroup]="form" >
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="positionX" [(ngModel)]="annotation.PositionX"
+                      [formControl]="form.controls['PositionX']" name="PositionX">
+                  </mat-form-field>
+                  <small *ngIf="form.controls['PositionX'].hasError('required') && form.controls['PositionX'].touched"
+                    class="text-danger support-text">PositionX is required.</small>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="PositionY" [(ngModel)]="annotation.PositionY"
+                      [formControl]="form.controls['PositionY']" name="PositionY">
+                  </mat-form-field>
+                  <small *ngIf="form.controls['PositionY'].hasError('required') && form.controls['PositionY'].touched"
+                    class="text-danger support-text">PositionY is required.</small>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Width" [(ngModel)]="annotation.Width"
+                      [formControl]="form.controls['Width']" name="Width">
+                  </mat-form-field>
+                  <small *ngIf="form.controls['Width'].hasError('required') && form.controls['Width'].touched"
+                    class="text-danger support-text">Width is required.</small>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Height" [(ngModel)]="annotation.Height"
+                      [formControl]="form.controls['Height']" name="Height">
+                  </mat-form-field>
+                  <small *ngIf="form.controls['Height'].hasError('required') && form.controls['Height'].touched"
+                    class="text-danger support-text">Height is required.</small>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="text" [(ngModel)]="annotation.text"
+                      [formControl]="form.controls['text']" name="text">
+                  </mat-form-field>
+                  <small *ngIf="form.controls['text'].hasError('required') && form.controls['text'].touched"
+                    class="text-danger support-text">text is required.</small>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Color" [(ngModel)]="annotation.Color"
+                      [formControl]="form.controls['Color']" name="Color">
+                  </mat-form-field>
+                  <small *ngIf="form.controls['Color'].hasError('required') && form.controls['Color'].touched"
+                    class="text-danger support-text">Color is required.</small>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="BackgroundColor" [(ngModel)]="annotation.BackgroundColor"
+                      [formControl]="form.controls['BackgroundColor']" name="BackgroundColor">
+                  </mat-form-field>
+                  <small *ngIf="form.controls['BackgroundColor'].hasError('required') && form.controls['BackgroundColor'].touched"
+                    class="text-danger support-text">BackgroundColor is required.</small>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Work Instruction Id</mat-label>
+                    <mat-select [(ngModel)]="annotation.WorkInstructionId" [formControl]="form.controls['WorkInstructionId']"
+                      name="WorkInstructionId">
+                      <mat-option *ngFor="let cm of calworkinst" [value]="cm.Id">
+                        {{cm.Id}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <small *ngIf="form.controls['WorkInstructionId'].hasError('required') && form.controls['WorkInstructionId'].touched"
+                    class="text-danger support-text">WorkInstructionId is required.</small>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right" 
+                    style="margin-left:10px" [disabled]="!form.valid">Save</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isAdd = false;isTable = true">Back</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+<div fxLayout="row wrap" *ngIf="isEdit">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Edit Annotations</mat-card-title>
+        <form (ngSubmit)="updateAnnotations()">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Annotations" [(ngModel)]="editAnnotation.PositionX"
+                      name="editAnnotation">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right"
+                    style="margin-left:10px">Update</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isTable = true; isEdit = false">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

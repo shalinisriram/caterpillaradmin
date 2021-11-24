@@ -1,0 +1,211 @@
+<div fxLayout="row wrap" *ngIf="isTable">
+  <div fxFlex.gt-md=100 fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <div fxLayout="row wrap">
+
+          <div fxFlex.gt-md=55 fxFlex.gt-sm="55" fxFlex.gt-xs="60" fxFlex="60">
+            <mat-card-title>Models</mat-card-title>
+          </div>
+
+          <div fxFlex.gt-md=20 fxFlex.gt-sm="20" fxFlex.gt-xs="30" fxFlex="30">
+            <mat-form-field>
+              <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+            </mat-form-field>
+          </div>
+
+          <div fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10">
+            <button mat-raised-button color="primary" class="pull-right" (click)="isTable = false;isAdd = true;">Add
+              Model</button>
+          </div>
+
+          <div fxFlex.gt-sm="15" fxFlex.gt-xs="10" fxFlex="10">
+            <button mat-raised-button color="warn" class="pull-right" (click)="deleteModels()"
+              [disabled]="!selection?.selected.length" id="deleteButton">Delete Selected Models</button>
+          </div>
+
+        </div>
+        <div class="mat-elevation-z8">
+          <mat-paginator [pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+          <table mat-table [dataSource]="dataSource">
+
+            <ng-container matColumnDef="Select">
+              <th style="width:auto"mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+                  [checked]="selection.hasValue() && isAllSelected()"
+                  [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()" color="warn"
+                  title="Select All">
+                </mat-checkbox>
+              </th>
+              <td style="width:auto"mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                  [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)" color="warn">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+
+
+            <ng-container matColumnDef="ModelName">
+              <th style="width:auto"mat-header-cell *matHeaderCellDef class="font"> Model </th>
+              <td style="width:auto"mat-cell *matCellDef="let element"><a (click)="showUpdateForm(element)"
+                  style="color:blue;cursor: pointer; text-decoration:underline"> {{element.ModelName}}</a> </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Description">
+              <th style="width:auto"mat-header-cell *matHeaderCellDef class="font"> Description </th>
+              <td style="width:auto"mat-cell *matCellDef="let element"> {{element.Description}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="SerialPrefix">
+              <th style="width:auto"mat-header-cell *matHeaderCellDef class="font"> Serial Prefix </th>
+              <td style="width:auto"mat-cell *matCellDef="let element"> {{element.SerialPrefix}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Sections">
+              <th style="width:auto"mat-header-cell *matHeaderCellDef class="font"> Section </th>
+              <td style="width:auto"mat-cell *matCellDef="let element"> {{element.Sections}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Remarks">
+              <th style="width:auto"mat-header-cell *matHeaderCellDef class="font"> Remarks </th>
+              <td style="width:auto"mat-cell *matCellDef="let element"> {{element.Remarks}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="IsActive">
+              <th style="width:auto"mat-header-cell *matHeaderCellDef class="font"> Status </th>
+              <td style="width:auto"mat-cell *matCellDef="let element"> {{element.IsActive?'Active':'Inactive'}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          </table>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap" *ngIf="isAdd">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Add Model</mat-card-title>
+        <form #addForm="ngForm" (ngSubmit)="addModel(addForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Model Name" [(ngModel)]="model.ModelName" name="ModelName" required>
+                    <mat-error>Model name required</mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="model.Sections" name="SectionName" multiple required>
+                      <mat-option *ngFor="let section of sectionList" [value]="section">
+                        {{section}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Description" [(ngModel)]="model.Description" name="Description">
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Serial Prefix" [(ngModel)]="model.SerialPrefix" name="SerialPrefix">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Remarks" [(ngModel)]="model.Remarks" name="Remarks">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right"
+                    style="margin-left:10px"[disabled]= "!addForm.valid">Save</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isAdd = false;isTable = true;getModels();addForm.resetForm();">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap" *ngIf="isEdit">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Edit Model</mat-card-title>
+        <form #EditForm="ngForm" (ngSubmit)="updateModel(EditForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="ModelName" [(ngModel)]="model.ModelName" name="ModelName">
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="model.Sections" name="SectionName" multiple required>
+                      <mat-option *ngFor="let section of sectionList" [value]="section">
+                        {{section}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Description" [(ngModel)]="model.Description" name="Description">
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Serial Prefix" [(ngModel)]="model.SerialPrefix" name="SerialPrefix">
+                  </mat-form-field>
+                </div>
+                
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Remarks" [(ngModel)]="model.Remarks" name="Remarks">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right"
+                    style="margin-left:10px">Update</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isEdit = false;isTable = true;getModels();EditForm.resetForm();">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

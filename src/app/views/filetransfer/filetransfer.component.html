@@ -1,0 +1,33 @@
+<div>
+    <mat-card>
+        <mat-card-header>
+          <mat-card-title>
+            File Transfer
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div>
+                <div #filesSelected *ngFor="let element of files">
+                    <input type="checkbox" #inputEl [name]="element" (change)="handleSelectionChange(inputEl.checked,element)">
+                    <label>{{element}}</label>
+                   
+                </div>
+                <div>
+                    <button mat-raised-button color="warn" class="pull-right" (click)=deleteFiles()>Delete</button>
+                    <button mat-raised-button color="primary" class="pull-right" (click)=downloadFiles()>Download</button>
+                </div>
+            </div>
+           
+         
+        </mat-card-content>
+
+        
+      </mat-card>
+      <mat-card>
+        <mat-card-content>
+        <mat-label>Select Files to Upload</mat-label><br>
+        <input type="file" (change)="onFileChanged($event)" multiple required>
+        <button mat-raised-button type="submit" class="pull-right" id="save" color="primary" (click)="uploadFiles()">Upload</button>
+     </mat-card-content>
+      </mat-card>
+    </div>

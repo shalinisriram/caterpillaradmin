@@ -1,0 +1,392 @@
+<mat-card *ngIf="isTable">
+  <mat-card-content>
+    <mat-card-title>Defects</mat-card-title>   
+    <div fxLayout="row wrap">
+
+        <div fxFlex.gt-md="12.5" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+              <mat-form-field class="p-r-10"> 
+                <mat-label>Section</mat-label>
+                <mat-select [(ngModel)]="defectobj.SectionName" name="Section" #select7 multiple (ngModelChange)="getAreaList();getLineLoadNumbers()">
+                  <div class="select-all">
+                    <mat-checkbox [(ngModel)]="allSelected" style="margin-left: 17px;margin-Top: 20px;"
+                                    [ngModelOptions]="{standalone: true}"
+                                    (change)="toggleAllSelection(select7)">Select All</mat-checkbox>
+                </div>
+                  <mat-option *ngFor="let section of SectionList" [value]="section" >
+                    {{section}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+        </div>
+
+        
+
+        <div fxFlex.gt-md="12.5" fxFlex.gt-sm="50" fxFlex.gt-xs="100" fxFlex="100">
+          <mat-form-field class="p-r-10">
+            <mat-label>Area</mat-label>
+            <mat-select [(ngModel)]="defectobj.AreaName" name="AreaName" #select8 multiple (ngModelChange)="getComponentList();getLineLoadNumbers()">
+              <div class="select-all">
+                <mat-checkbox [(ngModel)]="allSelected" style="margin-left: 17px;margin-Top: 20px;"
+                                [ngModelOptions]="{standalone: true}"
+                                (change)="toggleAllSelection(select8)">Select All</mat-checkbox>
+            </div>
+              <mat-option *ngFor="let area of AreaList" [value]="area" >
+                {{area}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div fxFlex.gt-md="12.5" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+          <mat-form-field class="p-r-10">
+            <mat-label>Component</mat-label>
+            <mat-select [(ngModel)]="defectobj.ComponentName" #select9 name="ComponentName" multiple (ngModelChange)="getModelList();getLineLoadNumbers()">
+              <div class="select-all">
+                <mat-checkbox [(ngModel)]="allSelected" style="margin-left: 17px;margin-Top: 20px;"
+                                [ngModelOptions]="{standalone: true}"
+                                (change)="toggleAllSelection(select9)">Select All</mat-checkbox>
+            </div>
+              <mat-option *ngFor="let component of ComponentList" [value]="component">
+                {{component}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div fxFlex.gt-md="12.5" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+          <mat-form-field class="p-r-10">
+            <mat-label>Model</mat-label>
+            <mat-select [(ngModel)]="defectobj.CATModelName" name="ModelName" #select10 multiple (ngModelChange)="getLineLoadNumbers()">
+              <div class="select-all">
+                <mat-checkbox [(ngModel)]="allSelected" style="margin-left: 17px;margin-Top: 20px;"
+                                [ngModelOptions]="{standalone: true}"
+                                (change)="toggleAllSelection(select10)">Select All</mat-checkbox>
+            </div>
+              <mat-option *ngFor="let model of ModelList" [value]="model">
+                {{model}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        
+
+        <div fxFlex.gt-md="12.5" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+          <mat-form-field class="p-r-10">
+            <mat-label>Line Load Number</mat-label>
+            <mat-select [(ngModel)]="defectobj.LineLoadNumber" #select11 name="LineLoadNumber" multiple >
+              <div class="select-all">
+                <mat-checkbox [(ngModel)]="allSelected" style="margin-left: 17px;margin-Top: 20px;"
+                                [ngModelOptions]="{standalone: true}"
+                                (change)="toggleAllSelection(select11)">Select All</mat-checkbox>
+            </div>
+              <mat-option *ngFor="let lineLoadNumber of lineLoadNumbers" [value]="lineLoadNumber">
+                {{lineLoadNumber}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div fxFlex.gt-md="12.5" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+          <mat-form-field class="p-r-10">
+            <mat-label>Aprrove</mat-label>
+            <mat-select [(ngModel)]="defectobj.Approve" name="Approve" >
+              <mat-option *ngFor="let Approve of BooleanList" [value]="Approve">
+                {{Approve}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div fxFlex.gt-md="12.5" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+          <mat-form-field class="p-r-10">
+            <mat-label>SignOff</mat-label>
+            <mat-select [(ngModel)]="defectobj.SignOff" name="SignOff" >
+              <mat-option *ngFor="let SignOff of BooleanList" [value]="SignOff">
+                {{SignOff}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div fxFlex.gt-md="12.5" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+          <button mat-raised-button id="button" color="primary" (click)="getDefects()">Get Defects</button>
+        </div>
+       
+
+      </div>
+    
+    <div class="mat-elevation-z8" style="overflow: auto;">
+      <mat-paginator [length]="defectsList.length"[pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+
+      <table mat-table [dataSource]="dataSource" matSort >
+        <ng-container matColumnDef="EventNumber">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>EventNumber</th>
+          <td mat-cell *matCellDef="let element">
+            <!-- <div *ngIf="element.status != null"> -->
+            <a  (click)="showUpdateForm(element)"
+             style="text-decoration: underline;color: blue; cursor: pointer;"> 
+              {{element.Id}}
+            </a> 
+            <!-- <a *ngIf="element.InspectionType=='NDE'" (click)="showUpdateForm(element)"
+             style="text-decoration: underline;color: blue; cursor: pointer;"> 
+              {{element.Id}}
+            </a>  -->
+            <!-- <a *ngIf="element.InspectionType=='RI'" (click)="showUpdateForm(element)"
+             style="text-decoration: underline;color: blue; cursor: pointer;"> 
+              {{element.Id}}
+            </a> </div> -->
+          </td>
+          </ng-container>
+          
+        <ng-container matColumnDef="CheckPoint">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:150px">CheckPoint</th>
+            <td mat-cell *matCellDef="let element"  > 
+                  <div *ngIf="element.QualityInstructions != null && element.Procedure !=null">
+                   <div *ngIf="element.QualityInstructions !== null && element.Procedure !==null">
+                    <div *ngFor="let i of element.QualityInstructions.CheckPoints">
+                      <div *ngIf="element.Procedure.SequenceNumber === i.SequenceNumber">
+                        {{i.ItemNo}}-{{i.Location}}
+
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="InspectionType">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>InspectionType</th>
+            <td mat-cell *matCellDef="let element"  > {{element.InspectionType}}
+              </td>
+          </ng-container>
+        <ng-container matColumnDef="PersonExecuted">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >PersonExecuted</th>
+            <td mat-cell *matCellDef="let element" > 
+                  <div *ngIf="element.unit != null">
+                   {{element.unit.UserName}}
+                    </div>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="AuditPerson">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >AuditPerson</th>
+            <td mat-cell *matCellDef="let element" > 
+                  <div *ngIf="element.Login != null">
+                   {{element.Login.UserName}}
+                    </div>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="Area">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Area</th>
+            <td mat-cell *matCellDef="let element">
+              <div *ngIf="element.unit != null">
+              {{element.unit.AreaName}}
+            </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Component">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Component</th>
+              <td mat-cell *matCellDef="let element">
+                <div *ngIf="element.unit != null">
+                {{element.unit.ComponentName}}
+              </div>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="LineLoadNumber">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>LineLoadNumber</th>
+                <td mat-cell *matCellDef="let element">
+                  <div *ngIf="element.unit != null">
+                      {{element.unit.LineLoadNumber}}
+                </div>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="Model">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Model</th>
+                  <td mat-cell *matCellDef="let element">
+                    <div *ngIf="element.unit != null">
+                        {{element.unit.ModelName}}
+                  </div>
+                  </td>
+                </ng-container>
+                <ng-container matColumnDef="Section">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Section</th>
+                    <td mat-cell *matCellDef="let element">
+                      <div *ngIf="element.unit != null">
+                          {{element.unit.SectionName}}
+                    </div>
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="SerialNumber">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header>SerialNumber</th>
+                      <td mat-cell *matCellDef="let element">
+                        <div *ngIf="element.unit != null">
+                            {{element.unit.SerialNumber}}
+                      </div>
+                      </td>
+                    </ng-container>
+         
+        <ng-container matColumnDef="AccountableOperator">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header >AccountableOperator </th>
+          <td mat-cell *matCellDef="let element" > {{element.AccountableOperator}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="AccountableOperatorComment">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header >AccountableOperatorComment</th>
+          <td mat-cell *matCellDef="let element" >{{element.AccountableOperatorComment}} </td>
+        </ng-container>
+        
+        
+        <ng-container matColumnDef="Approval">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Deffect Time </th>
+          <td mat-cell *matCellDef="let element">{{element.status.CompletedTime}} </td>
+        </ng-container>
+        <ng-container matColumnDef="AuditNumber">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>AuditNumber </th>
+          <td mat-cell *matCellDef="let element"> {{element.AuditNumber}} </td>
+        </ng-container>
+        <ng-container matColumnDef="CorrectiveActionStatus">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>CorrectiveActionStatus </th>
+          <td mat-cell *matCellDef="let element"> {{element.CorrectiveActionStatus}} </td>
+        </ng-container>
+        <ng-container matColumnDef="InterimContainmentAction">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>InterimContainmentAction </th>
+          <td mat-cell *matCellDef="let element"> {{element.InterimContainmentAction}} </td>
+        </ng-container>
+        <ng-container matColumnDef="PermanentCorrectiveAction">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>PermanentCorrectiveAction </th>
+          <td mat-cell *matCellDef="let element"> {{element.PermanentCorrectiveAction}} </td>
+        </ng-container>
+        <ng-container matColumnDef="ProblemCorrection">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>ProblemCorrection </th>
+          <td mat-cell *matCellDef="let element"> {{element.ProblemCorrection}} </td>
+        </ng-container>
+        <ng-container matColumnDef="QualityComments">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>QualityComments </th>
+          <td mat-cell *matCellDef="let element"> {{element.QualityComments}} </td>
+        </ng-container>
+        <ng-container matColumnDef="RootCause">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>RootCause </th>
+          <td mat-cell *matCellDef="let element"> {{element.RootCause}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="SignOff">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>SignOff </th>
+          <td mat-cell *matCellDef="let element"> {{element.SignOff}} </td>
+        </ng-container>
+       
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+
+  </mat-card-content>
+</mat-card>
+<div fxLayout="row wrap" *ngIf="isEdit">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Upadte Defects </mat-card-title>
+        
+        <form #EditForm="ngForm" (ngSubmit)="updateDefects(EditForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>AreaName</mat-label>
+                    <input disabled matInput placeholder="AreaName" required [(ngModel)]="AreaName" name="AreaName">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>ComponentName</mat-label>
+                    <input matInput disabled placeholder="ComponentName" required [(ngModel)]="ComponentName" name="ComponentName">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>LineLoadNumber</mat-label>
+                    <input matInput disabled placeholder="LineLoadNumber" required [(ngModel)]="LineLoadNumber" name="LineLoadNumber">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>ModelName</mat-label>
+                    <input matInput disabled placeholder="ModelName" required [(ngModel)]="ModelName" name="ModelName">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>SectionName</mat-label>
+                    <input matInput disabled placeholder="SectionName" required [(ngModel)]="SectionName" name="SectionName">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>SerialNumber</mat-label>
+                    <input matInput disabled placeholder="SerialNumber" required [(ngModel)]="SerialNumber" name="SerialNumber">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>CorrectiveActionStatus</mat-label>
+                    <input matInput placeholder="CorrectiveActionStatus" required [(ngModel)]="defect.CorrectiveActionStatus" name="CorrectiveActionStatus">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>ProblemCorrection</mat-label>
+                    <input matInput placeholder="ProblemCorrection" required [(ngModel)]="defect.ProblemCorrection" name="ProblemCorrection">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>InterimContainmentAction</mat-label>
+                    <input matInput placeholder="InterimContainmentAction" required [(ngModel)]="defect.InterimContainmentAction" name="InterimContainmentAction">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>RootCause</mat-label>
+                    <input matInput placeholder="RootCause" required [(ngModel)]="defect.RootCause" name="RootCause">
+                  </mat-form-field>
+                </div>
+                
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>PermanentCorrectiveAction</mat-label>
+                    <input matInput placeholder="PermanentCorrectiveAction" required [(ngModel)]="defect.PermanentCorrectiveAction" name="PermanentCorrectiveAction">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>AccountableOperator</mat-label>
+                    <input matInput placeholder="AccountableOperator" required [(ngModel)]="defect.AccountableOperator" name="AccountableOperator">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>AccountableOperatorComment</mat-label>
+                    <input matInput placeholder="AccountableOperatorComment" required [(ngModel)]="defect.AccountableOperatorComment" name="AccountableOperatorComment">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Assignto</mat-label>
+                    <input matInput placeholder="Assignto"  required [(ngModel)]="defect.Assignto" name="Assignto">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button type="submit" class="pull-right" id="save" style="margin-left:10px"
+                    color="primary">Update</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="showTable();EditForm.resetForm();">Cancel</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

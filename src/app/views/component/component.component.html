@@ -1,0 +1,236 @@
+<!-- Component Table -->
+<div fxLayout="row wrap" *ngIf="isTable">
+  <div fxFlex.gt-md=100 fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <div fxLayout="row wrap">
+          <div fxFlex.gt-md=45 fxFlex.gt-sm="45" fxFlex.gt-xs="15" fxFlex="15">
+            <mat-card-title>Components</mat-card-title>
+          </div>
+          <div fxFlex.gt-md=20 fxFlex.gt-sm="20" fxFlex.gt-xs="20" fxFlex="20" class="p-r-20">
+            <mat-form-field>
+              <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+            </mat-form-field>
+          </div>
+          <div fxFlex.gt-md=15 fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10"  class="p-r-20">
+            <button mat-raised-button color="primary" class="pull-right" (click)="isAdd = true;isTable = false">Add
+              Component</button>
+          </div>
+          <div fxFlex.gt-md=20 fxFlex.gt-sm="15" fxFlex.gt-xs="10" fxFlex="10">
+            <button mat-raised-button color="warn" class="pull-right" (click)="deleteComponents()"
+              [disabled]="!selection?.selected.length" id="deleteButton">Delete Selected Components</button>
+          </div>
+        </div>
+
+        <div class="mat-elevation-z8" style="overflow: auto;">
+          <mat-paginator [pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+          <table mat-table [dataSource]="dataSource" matSort>
+            <ng-container matColumnDef="Select">
+              <th style="width:auto"mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+                  [checked]="selection.hasValue() && isAllSelected()"
+                  [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()" color="warn"
+                  title="Select All">
+                </mat-checkbox>
+              </th>
+              <td style="width:auto"mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                  [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)" color="warn">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+          
+
+            <ng-container matColumnDef="ComponentName">
+              <th style="width:auto"mat-header-cell *matHeaderCellDef mat-sort-header class="font">Component</th>
+              <td style="width:auto"mat-cell *matCellDef="let element"><a (click)="showUpdateForm(element)"
+                style="color:blue;cursor: pointer;text-decoration: underline">{{element.ComponentName}}</a></td>
+            </ng-container>
+            
+            <ng-container matColumnDef="Areas">
+              <th style="width:auto"mat-header-cell *matHeaderCellDef mat-sort-header class="font">Area</th>
+              <td style="width:auto"mat-cell *matCellDef="let element">{{element.Areas}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="CATModels">
+              <th style="width:auto"mat-header-cell *matHeaderCellDef class="font">  Model</th>
+              <td style="width:auto"mat-cell *matCellDef="let element"> {{element.CATModels}} </td>
+            </ng-container>
+            <ng-container matColumnDef="EngineeringChange">
+              <th style="width:auto"mat-header-cell *matHeaderCellDef class="font"> Engineering Change </th>
+              <td style="width:auto"mat-cell *matCellDef="let element"> {{element.EngineeringChange}} </td>
+            </ng-container>
+            <ng-container matColumnDef="EffectiveDate">
+              <th style="width:auto"mat-header-cell *matHeaderCellDef class="font"> Effective Date </th>
+              <td style="width:auto"mat-cell *matCellDef="let element"> {{element.EffectiveDate}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Remarks">
+              <th style="width:auto"mat-header-cell *matHeaderCellDef class="font"> Remarks </th>
+              <td style="width:auto"mat-cell *matCellDef="let element"> {{element.Remarks}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+<!-- Add component -->
+<div fxLayout="row wrap" *ngIf="isAdd">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Add Component</mat-card-title>
+        <form #addForm="ngForm" (ngSubmit)="addComponent(addForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Identification Number" [(ngModel)]="component.ComponentName" name="Component" required> 
+                    <mat-error>Identification Number required</mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Engineering Change" [(ngModel)]="component.EngineeringChange" name="EngineeringChange">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Area</mat-label>
+                    <mat-select [(ngModel)]="component.Areas" name="Areas" multiple>
+                      <mat-option *ngFor="let area of areaList" [value]="area.AreaName">
+                        {{area.AreaName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Model</mat-label>
+                    <mat-select [(ngModel)]="component.CATModels" name="CATModels" multiple>
+                      <mat-option *ngFor="let model of modelList" [value]="model.ModelName">
+                        {{model.ModelName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Effective Date</mat-label>
+                    <input matInput [matDatepicker]="picker" [(ngModel)]="component.EffectiveDate"  name="EffectiveDate">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Remark" [(ngModel)]="component.Remarks" name="Remarks">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right"
+                    style="margin-left:10px"[disabled]="!addForm.valid">Save</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isAdd = false;isTable = true;getcomponents();addForm.resetForm();">Cancel</button>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                 <p style="font-size:0.8rem">Note : Identification Number should not contain underscore ( _ ) .</p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+<!-- Edit Component -->
+<div fxLayout="row wrap" *ngIf="isEdit">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Edit Component</mat-card-title>
+        <form #EditForm="ngForm" (ngSubmit)="updateComponent(EditForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Name" [(ngModel)]="component.ComponentName" name="Component">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Engineering Change" [(ngModel)]="component.EngineeringChange"
+                     name="EngineeringChange">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Area</mat-label>
+                    <mat-select [(ngModel)]="component.Areas" name="Areas" multiple>
+                      <mat-option *ngFor="let area of areaList" [value]="area.AreaName">
+                        {{area.AreaName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Model</mat-label>
+                    <mat-select [(ngModel)]="component.CATModels" name="CATModels" multiple>
+                      <mat-option *ngFor="let model of modelList" [value]="model.ModelName">
+                        {{model.ModelName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Effective Date</mat-label>
+                    <input matInput [matDatepicker]="picker" [(ngModel)]="component.EffectiveDate" name="EffectiveDate">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Remark" [(ngModel)]="component.Remarks"
+                     name="Remarks">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right"
+                    style="margin-left:10px">update</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isEdit = false;isTable = true;getcomponents();EditForm.resetForm();">Cancel</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

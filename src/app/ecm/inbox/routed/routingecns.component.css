@@ -1,0 +1,26 @@
+.usrform{
+    width: 500px;
+    height: 500px;
+    border: 5px;
+    border-color: black;
+}
+.custom-select {
+    position: relative;
+    font-family: Arial;
+  }
+.mat-cell {
+    padding: 2px;
+    text-align: center;
+    border-right: 1px solid lightgray;
+}
+
+.mat-header-cell {
+    background-color: lightgray;
+    font-weight: bold;
+    font-size: 15px;
+    width:100%
+  }
+
+table {
+    width: 100%;
+} 

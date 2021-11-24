@@ -1,0 +1,30 @@
+table {
+    width: 100%;
+} 
+#deleteButton{
+    background-color: #d01a1a;
+  }
+  
+  #deleteButton:disabled{
+    background-color: #808080;
+  }
+  .mat-cell {
+    padding: 2px;
+    text-align: left;
+    border-right: 1px solid lightgray;
+}
+.mat-header-cell {
+  background-color: lightgray;
+  font-weight: bold;
+  font-size: 15px;
+  width:100%;
+  padding: 0px;
+  /* border-right: 1px solid darkgray; */
+}
+.page-content
+{
+  padding: 0px;
+} 
+.select-all{
+  margin: 5px 17px;
+}

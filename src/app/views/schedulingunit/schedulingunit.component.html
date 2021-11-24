@@ -1,0 +1,380 @@
+<mat-card *ngIf="isAdd">
+  <mat-card-content>
+    <mat-card-title>Add Schedule Unit</mat-card-title>
+    <form #f="ngForm" (ngSubmit)="addUnit();f.resetForm();">
+      <div fxLayout="row wrap">
+        <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+          <div fxLayout="row wrap">
+
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+              <mat-form-field>
+                <mat-label>Section</mat-label>
+                <mat-select [(ngModel)]="units.SectionName" name="SectionName" (ngModelChange)="getModelsLIst()" required>
+                  <mat-option *ngFor="let section of sectionsListUnit" [value]="section">
+                    {{section}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <small *ngIf="form.controls['SectionName'].hasError('required') && form.controls['SectionName'].touched"
+                class="text-danger support-text">Section is required.</small>
+            </div>
+
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+              <mat-form-field>
+                <mat-label>Model</mat-label>
+                <mat-select [(ngModel)]="units.ModeName" name="ModeName" (ngModelChange)="change()" required>
+                  <mat-option *ngFor="let model of modelListUnit" [value]="model.ModelName">
+                    {{model.ModelName}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <small *ngIf="form.controls['ModeName'].hasError('required') && form.controls['ModeName'].touched"
+                class="text-danger support-text">Model is required.</small>
+            </div>
+<!-- 
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+              <mat-form-field>
+                <mat-label>Area</mat-label>
+                <mat-select [(ngModel)]="units.AreaName" name="AreaName" (ngModelChange)="getStationsUnit()" required>
+                  <mat-option *ngFor="let area of areaListUnit" [value]="area" required>
+                    {{area}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <small *ngIf="form.controls['AreaName'].hasError('required') && form.controls['AreaName'].touched"
+                class="text-danger support-text">Area is required.</small>
+            </div>
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                <mat-form-field>
+                  <mat-label>Station</mat-label>
+                  <mat-select [(ngModel)]="units.StationName" name="StationName"  (ngModelChange)="getComponentsUnit()" required>
+                    <mat-option *ngFor="let station of StationListUnit" [value]="station.StationName" required>
+                      {{station.StationName}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <small *ngIf="form.controls['AreaName'].hasError('required') && form.controls['AreaName'].touched"
+                  class="text-danger support-text">Station is required.</small>
+              </div>
+
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+              <mat-form-field>
+                <mat-label>Component</mat-label>
+                <mat-select [(ngModel)]="units.ComponentName" name="ComponentName" (ngModelChange)="getSerialNumber()" required>
+                  <mat-option *ngFor="let component of componentListUnit" [value]="component" required>
+                    {{component}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <small
+                *ngIf="form.controls['ComponentName'].hasError('required') && form.controls['ComponentName'].touched"
+                class="text-danger support-text">Component is required.</small>
+            </div> -->
+
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100" >
+              <mat-form-field>
+                <mat-label>Start On Line Date</mat-label>
+                <input matInput [max]="tomorrow" [matDatepicker]="picker1" [(ngModel)]="units.CreatedTimeStamp" name="CreatedTimeStamp"
+                  [formControl]="form.controls['CreatedTimeStamp']" required>
+                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                <mat-datepicker #picker1></mat-datepicker>
+              </mat-form-field>
+            </div>
+
+
+             <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100" >
+              <mat-form-field>
+                <input matInput placeholder="Serial Number" [(ngModel)]="units.SerialNumber"
+                  [formControl]="form.controls['SerialNumber']" pattern="^[a-zA-Z0-9- ]*$" name="SerialNumber" required>
+              </mat-form-field>
+              <small *ngIf="form.controls['SerialNumber'].hasError('required') 
+              && form.controls['SerialNumber'].touched "
+                class="text-danger support-text">Serial Number is required.</small>
+                <small *ngIf="form.controls['SerialNumber'].errors?.pattern"
+                class="text-danger support-text">Serial Number should not contain any special characters except (-)</small>
+            </div> 
+
+
+            <!-- <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100" *ngIf="form1 && !form2">
+              <mat-form-field>
+                <input matInput placeholder="Serial Number" [(ngModel)]="units.SerialNumber"
+                  [formControl]="form.controls['SerialNumber']" pattern="^[a-zA-Z0-9- ]*$" name="SerialNumber" required>
+              </mat-form-field>
+              <small *ngIf="form.controls['SerialNumber'].hasError('required') 
+              && form.controls['SerialNumber'].touched "
+                class="text-danger support-text">Serial Number is required.</small>
+                <small *ngIf="form.controls['SerialNumber'].errors?.pattern"
+                class="text-danger support-text">Serial Number should not contain any special characters except (-)</small>
+            </div>
+
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100" *ngIf="form2 && !form1">
+
+              <mat-form-field>
+                <mat-label>Serial Number</mat-label>
+                <mat-select [(ngModel)]="units.SerialNumber" name="SerialNumber" required>
+                  <mat-option *ngFor="let component of LineLoad" [value]="component" required>
+                    {{component}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+             
+              <small *ngIf="form.controls['SerialNumber'].hasError('required') 
+              && form.controls['SerialNumber'].touched "
+                class="text-danger support-text">Serial Number is required.</small>
+                <small *ngIf="form.controls['SerialNumber'].errors?.pattern"
+                class="text-danger support-text">Serial Number should not contain any special characters except (-)</small>
+            </div> -->
+
+            
+
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+              <button mat-raised-button type="submit" class="pull-right" id="save"
+                style="margin-left:10px;background-color: blue;color: white;" [disabled] ="!f.valid" 
+                >Save</button>
+              <button mat-raised-button color="warn" class="pull-right"
+                (click)="isAdd = !isAdd;isTable = !isTable;f.resetForm();">Cancel</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </form>
+   
+  </mat-card-content>
+</mat-card>
+
+<mat-card *ngIf="isEdit">
+  <mat-card-content>
+    <mat-card-title>Edit Schedule Unit</mat-card-title>
+    <form #f="ngForm" (ngSubmit)="UpdateAddunit();f.resetForm();">
+      <div fxLayout="row wrap">
+        <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+          <div fxLayout="row wrap">
+
+            <!-- <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+              <mat-form-field>
+                <mat-label>Section</mat-label>
+                <mat-select [(ngModel)]="units.SectionName" name="SectionName" (ngModelChange)="getModelsLIst()" required>
+                  <mat-option *ngFor="let section of sectionsListUnit" [value]="section">
+                    {{section}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <small *ngIf="form.controls['SectionName'].hasError('required') && form.controls['SectionName'].touched"
+                class="text-danger support-text">Section is required.</small>
+            </div>
+
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+              <mat-form-field>
+                <mat-label>Model</mat-label>
+                <mat-select [(ngModel)]="units.ModeName" name="ModeName" (ngModelChange)="change()" required>
+                  <mat-option *ngFor="let model of modelListUnit" [value]="model.ModelName">
+                    {{model.ModelName}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <small *ngIf="form.controls['ModeName'].hasError('required') && form.controls['ModeName'].touched"
+                class="text-danger support-text">Model is required.</small>
+            </div> -->
+<!-- 
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+              <mat-form-field>
+                <mat-label>Area</mat-label>
+                <mat-select [(ngModel)]="units.AreaName" name="AreaName" (ngModelChange)="getStationsUnit()" required>
+                  <mat-option *ngFor="let area of areaListUnit" [value]="area" required>
+                    {{area}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <small *ngIf="form.controls['AreaName'].hasError('required') && form.controls['AreaName'].touched"
+                class="text-danger support-text">Area is required.</small>
+            </div>
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                <mat-form-field>
+                  <mat-label>Station</mat-label>
+                  <mat-select [(ngModel)]="units.StationName" name="StationName"  (ngModelChange)="getComponentsUnit()" required>
+                    <mat-option *ngFor="let station of StationListUnit" [value]="station.StationName" required>
+                      {{station.StationName}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <small *ngIf="form.controls['AreaName'].hasError('required') && form.controls['AreaName'].touched"
+                  class="text-danger support-text">Station is required.</small>
+              </div>
+
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+              <mat-form-field>
+                <mat-label>Component</mat-label>
+                <mat-select [(ngModel)]="units.ComponentName" name="ComponentName" (ngModelChange)="getSerialNumber()" required>
+                  <mat-option *ngFor="let component of componentListUnit" [value]="component" required>
+                    {{component}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <small
+                *ngIf="form.controls['ComponentName'].hasError('required') && form.controls['ComponentName'].touched"
+                class="text-danger support-text">Component is required.</small>
+            </div> -->
+
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100" >
+              <mat-form-field>
+                <mat-label>Start On Line Date</mat-label>
+                <input matInput [max]="tomorrow" [matDatepicker]="picker1" [(ngModel)]="units.CreatedTimeStamp" name="CreatedTimeStamp"
+                  [formControl]="form.controls['CreatedTimeStamp']" required>
+                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                <mat-datepicker #picker1></mat-datepicker>
+              </mat-form-field>
+            </div>
+
+
+             <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100" >
+              <mat-form-field>
+                <input matInput placeholder="Serial Number" [(ngModel)]="units.SerialNumber"
+                  [formControl]="form.controls['SerialNumber']" pattern="^[a-zA-Z0-9- ]*$" name="SerialNumber" required>
+              </mat-form-field>
+              <small *ngIf="form.controls['SerialNumber'].hasError('required') 
+              && form.controls['SerialNumber'].touched "
+                class="text-danger support-text">Serial Number is required.</small>
+                <small *ngIf="form.controls['SerialNumber'].errors?.pattern"
+                class="text-danger support-text">Serial Number should not contain any special characters except (-)</small>
+            </div> 
+
+
+            <!-- <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100" *ngIf="form1 && !form2">
+              <mat-form-field>
+                <input matInput placeholder="Serial Number" [(ngModel)]="units.SerialNumber"
+                  [formControl]="form.controls['SerialNumber']" pattern="^[a-zA-Z0-9- ]*$" name="SerialNumber" required>
+              </mat-form-field>
+              <small *ngIf="form.controls['SerialNumber'].hasError('required') 
+              && form.controls['SerialNumber'].touched "
+                class="text-danger support-text">Serial Number is required.</small>
+                <small *ngIf="form.controls['SerialNumber'].errors?.pattern"
+                class="text-danger support-text">Serial Number should not contain any special characters except (-)</small>
+            </div>
+
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100" *ngIf="form2 && !form1">
+
+              <mat-form-field>
+                <mat-label>Serial Number</mat-label>
+                <mat-select [(ngModel)]="units.SerialNumber" name="SerialNumber" required>
+                  <mat-option *ngFor="let component of LineLoad" [value]="component" required>
+                    {{component}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+             
+              <small *ngIf="form.controls['SerialNumber'].hasError('required') 
+              && form.controls['SerialNumber'].touched "
+                class="text-danger support-text">Serial Number is required.</small>
+                <small *ngIf="form.controls['SerialNumber'].errors?.pattern"
+                class="text-danger support-text">Serial Number should not contain any special characters except (-)</small>
+            </div> -->
+
+            
+
+            <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+              <button mat-raised-button type="submit" class="pull-right" id="save"
+                style="margin-left:10px;background-color: blue;color: white;" [disabled] ="!f.valid" 
+                >Save</button>
+              <button mat-raised-button color="warn" class="pull-right"
+                (click)="isEdit = !isEdit;isTable = !isTable;f.resetForm();">Cancel</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </form>
+   
+  </mat-card-content>
+</mat-card>
+
+
+<mat-card *ngIf="isTable">
+  <mat-card-content>
+    <div fxLayout="row wrap">
+      <div fxFlex.gt-md=35 fxFLex.gt-sm=30 fxFlex.gt-xs=30 fxFlex=30>
+        <mat-card-title>
+          Schedule Units
+        </mat-card-title>
+      </div>
+      <div fxFlex.gt-md=25 fxFLex.gt-sm=50 fxFlex.gt-xs=50 fxFlex=50>
+        <mat-form-field>
+          <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+        </mat-form-field>
+      </div>
+      <div fxFlex.gt-md=20 fxFLex.gt-sm=20 fxFlex.gt-xs=20 fxFlex=20>
+        <button mat-raised-button color="primary" class="pull-right" type="submit"
+          (click)="isTable = !isTable;isAdd = !isAdd ;getSectionsList();getAreasList();getSchedulingUnits()">Add Scheduling
+          Unit</button>
+      </div>
+
+      <div fxFlex.gt-md=20 fxFlex.gt-sm="15" fxFlex.gt-xs="10" fxFlex="10">
+        <button mat-raised-button color="warn" class="pull-right" (click)="deleteUnits()"
+          [disabled]="!selection?.selected.length" id="deleteButton">Delete Selected Units</button>
+      </div>
+    </div>
+
+
+    <div class="mat-elevation-z8" style="overflow: auto;">
+      <mat-paginator [pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+      <table mat-table  #sortCol2 matSort  [dataSource]="dataSource2">
+        <ng-container matColumnDef="Select">
+          <th mat-header-cell *matHeaderCellDef style="width:auto">
+            <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()" color="warn"
+              title="Select All">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row"  style="width:auto">
+            <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+              [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)" color="warn">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="SerialNumber" >
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:auto">Serial Number </th>
+          <td mat-cell *matCellDef="let element" style="width:auto"> <a (click)="showUpdateForm(element)"
+            style="color:blue;cursor: pointer; text-decoration: underline"> {{element.SerialNumber}}</a></td>
+        </ng-container>
+
+        <ng-container matColumnDef="SectionName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:auto">Section</th>
+          <td mat-cell *matCellDef="let element" style="width:auto"> {{element.SectionName}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="ModelName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:auto">Model</th>
+          <td mat-cell *matCellDef="let element" style="width:auto"> {{element.ModeName}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="AreaName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:auto">Area</th>
+          <td mat-cell *matCellDef="let element" style="width:auto"> {{element.AreaName}} </td>
+        </ng-container>
+
+        <!-- <ng-container matColumnDef="StationName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Station</th>
+            <td mat-cell *matCellDef="let element"> {{element.StationName}} </td>
+          </ng-container> -->
+        <ng-container matColumnDef="ComponentName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:auto">Component</th>
+          <td mat-cell *matCellDef="let element" style="width:auto"> {{element.ComponentName}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="CreateTime">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:auto">Start on line date</th>
+          <td mat-cell *matCellDef="let element" style="width:auto"> {{element.CurrentTimeStamp}} </td>
+        </ng-container>
+       
+    
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns2;"></tr>
+      </table>
+    </div>
+
+  </mat-card-content>
+</mat-card>

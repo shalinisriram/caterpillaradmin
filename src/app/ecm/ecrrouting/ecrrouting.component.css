@@ -1,0 +1,15 @@
+.layout
+{
+
+    width: 50%;
+    border: 5px ;
+    background-color: lightgrey;
+    padding: 50px;
+    margin: 20px;
+}
+.mat-header-cell {
+    background-color: lightgray;
+    font-weight: bold;
+    font-size: 15px;
+    width:100%
+  }

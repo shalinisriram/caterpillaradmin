@@ -1,0 +1,197 @@
+
+  
+  <div fxLayout="row wrap" *ngIf="isTable">
+    <div fxFlex.gt-md=100 fxFlex.gt-sm=100 fxFlex.gt-xs=100 fxFlex=100>
+      <mat-card>
+        <mat-card-content>
+          <div fxLayout="row wrap" >
+
+            <button mat-raised-button color="primary" style="margin: 10px; " style="float: right;" class="pull-right" (click)=" addEcrCreation()">Add Ecr Creation</button>
+          </div>
+            <div  fxLayout="row wrap" class="mat-elevation-z8" style="overflow: auto;">
+              <mat-paginator [length]="dataList.length"[pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+    
+              <table mat-table [dataSource]="dataSource" matSort >
+    
+                <ng-container matColumnDef="ECRNumber">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%" > ECR Number</th>
+                  <td mat-cell *matCellDef="let element" style="width:10%"><a  (click)="showUpdateForm(element)" style="text-decoration: underline;color: blue; cursor: pointer;"> {{element.ecr.ECRNumber}}</a> </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="Description">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Description </th>
+                  <td mat-cell *matCellDef="let element"> {{element.ecr.Description}} </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="CreationDate">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> CreationDate </th>
+                  <td mat-cell *matCellDef="let element" style="width:5%"> {{element.ecr.CurrentTimeStamp|date:'dd-MMM-yy h:mm'}} </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="EffectiveDate">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> EffectiveDate </th>
+                  <td mat-cell *matCellDef="let element" style="width:5%"> {{element.ecr.EffectiveDate|date:'dd-MMM-yy h:mm'}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="SerialNumber">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> SerialNumber </th>
+                  <td mat-cell *matCellDef="let element" style="width:5%"> {{element.ecr.SerialNumber}} </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="Status">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Status </th>
+                  <td mat-cell *matCellDef="let element" style="width:5%"> {{element.ecr.Status}} </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="PartNumber">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> PartNumber </th>
+                  <td mat-cell *matCellDef="let element" style="width:5%"> {{element.ecr.PartNumber}} </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="RevisionNumber">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> RevisionNumber </th>
+                  <td mat-cell *matCellDef="let element" style="width:5%"> {{element.ecr.RevisionNumber}} </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="Requested">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Requested </th>
+                  <td mat-cell *matCellDef="let element" style="width:5%"> {{element.ecr.RequestedBy}} </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="CatJobNumber">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> CatJobNumber </th>
+                  <td mat-cell *matCellDef="let element" style="width:5%"> {{element.ecr.CatJobNumber}} </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="Type">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Type </th>
+                  <td mat-cell *matCellDef="let element" style="width:5%"> {{element.ecr.ECRType}} </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="Version">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Version </th>
+                  <td mat-cell *matCellDef="let element" style="width:5%"> {{element.ecr.Version}} </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="FileB">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> File  </th>
+                  <td mat-cell *matCellDef="let element" style="width:5%"><a (click)="downloadFiles()"
+                    style="color:blue;cursor: pointer; text-decoration: underline"> {{element.ecr.Files}} </a></td>
+                </ng-container>
+                <ng-container matColumnDef="Remarks">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Remarks  </th>
+                  <td mat-cell *matCellDef="let element" style="width:5%"> {{element.ecr.Remarks}} </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              </table>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card>
+          <mat-card-header>ECN Dashboard</mat-card-header> 
+          <mat-card-content> 
+              <div class="mat-elevation-z8" style="overflow: auto;">
+                <mat-paginator [length]="ecrlists.length"[pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+      
+                <table mat-table [dataSource]="datasourceecr" matSort >
+      
+                  <ng-container matColumnDef="ECRNumber">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%" > ECR Number</th>
+                    <td mat-cell *matCellDef="let element" style="width:10%"> {{element.ECRNumber}} </td>
+                  </ng-container>
+      
+                  <ng-container matColumnDef="Description">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Description </th>
+                    <td mat-cell *matCellDef="let element">  {{element.Description}} </td>
+                  </ng-container>
+      
+                  <ng-container matColumnDef="CreationDate">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> CreationDate </th>
+                    <td mat-cell *matCellDef="let element" style="width:5%"> {{element.CurrentTimeStamp|date:'dd-MMM-yy h:mm'}} </td>
+                  </ng-container>
+      
+                  <ng-container matColumnDef="EffectiveDate">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> EffectiveDate </th>
+                    <td mat-cell *matCellDef="let element" style="width:5%"> {{element.EffectiveDate|date:'dd-MMM-yy h:mm'}} </td>
+                  </ng-container>
+  
+                  <ng-container matColumnDef="SerialNumber">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> SerialNumber </th>
+                    <td mat-cell *matCellDef="let element" style="width:5%"> {{element.SerialNumber}} </td>
+                  </ng-container>
+      
+                  <ng-container matColumnDef="Status">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Status </th>
+                    <td mat-cell *matCellDef="let element" style="width:5%"> {{element.Status}} </td>
+                  </ng-container>
+      
+                  <ng-container matColumnDef="PartNumber">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> PartNumber </th>
+                    <td mat-cell *matCellDef="let element" style="width:5%"> {{element.PartNumber}} </td>
+                  </ng-container>
+      
+                  <ng-container matColumnDef="RevisionNumber">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> RevisionNumber </th>
+                    <td mat-cell *matCellDef="let element" style="width:5%"> {{element.RevisionNumber}} </td>
+                  </ng-container>
+      
+                  <ng-container matColumnDef="Requested">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Requested </th>
+                    <td mat-cell *matCellDef="let element" style="width:5%"> {{element.RequestedBy}} </td>
+                  </ng-container>
+      
+                  <ng-container matColumnDef="CatJobNumber">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> CatJobNumber </th>
+                    <td mat-cell *matCellDef="let element" style="width:5%"> {{element.CatJobNumber}} </td>
+                  </ng-container>
+      
+                  <ng-container matColumnDef="Type">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Type </th>
+                    <td mat-cell *matCellDef="let element" style="width:5%"> {{element.ECRType}} </td>
+                  </ng-container>
+      
+                  <ng-container matColumnDef="Version">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Version </th>
+                    <td mat-cell *matCellDef="let element" style="width:5%"> {{element.Version}} </td>
+                  </ng-container>
+                  
+              <ng-container matColumnDef="log">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> ECMLog </th>
+                <td mat-cell *matCellDef="let element" style="width:5%"> <button matTooltip="Default" mat-icon-button
+                  class="pull-right" (click)="getLog(element)">
+                  <mat-icon>info</mat-icon>
+                    </button> </td>
+              </ng-container>
+      
+                  <ng-container matColumnDef="FileB">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> File  </th>
+                    <td mat-cell *matCellDef="let element" style="width:5%"><a (click)="downloadFiles()"
+                      style="color:blue;cursor: pointer; text-decoration: underline"> {{element.Files}} </a></td>
+                  </ng-container>
+                  <ng-container matColumnDef="Remarks">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Remarks  </th>
+                    <td mat-cell *matCellDef="let element" style="width:5%"> {{element.Remarks}} </td>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns1;"></tr>
+                </table>
+              </div>
+            </mat-card-content>
+          </mat-card>
+      </div>
+    </div>
+    <div fxLayout="row wrap" *ngIf="isEdit">
+      <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+        <mat-card style="padding: 0px;margin: 0px;">
+          <mat-card-content style="padding: 0px; margin:5px;">
+            <app-ecrcreation [data]="ecr"></app-ecrcreation>
+            <a role="button" (click)="downloadFiles(ecr.Files)" style="text-decoration: underline;color: blue; cursor: pointer;font-weight: bold;">{{ecr.Files}}</a>
+            <button mat-raised-button  color="primary" style="margin: 10px;" class="pull-right" (click)="isTable=true;isEdit=false;getInbox()">Back</button>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    
+    </div>
+

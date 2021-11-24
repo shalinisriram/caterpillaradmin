@@ -1,0 +1,37 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>
+      Settings
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div>
+      <div>
+          <input type="checkbox" #inputEl [checked]="timer.IsActive" [name]="timer.Task" (change)="onChange(inputEl.checked,timer.Task)">
+          <label>{{timer.Task}}</label><br>
+          <label>{{demend.Task}} :</label>
+          
+          <mat-form-field style="width: 15%;" >
+            <input matInput [(ngModel)]="value" name="value"  > 
+          </mat-form-field>
+         <button  mat-raised-button color="primary"
+          (click)="onChange1(demend.Task)">
+               Update
+            </button>
+      </div>
+    </div>
+
+    <div style="width: 20%; padding-top: 1%;">
+      <mat-form-field appearance="fill">
+        <mat-label>Select month for Auto move units  to archive </mat-label>
+        <mat-select>
+          <mat-option *ngFor="let food of months" [value]="food">
+            {{food}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+      
+  </mat-card-content>
+</mat-card>
+  

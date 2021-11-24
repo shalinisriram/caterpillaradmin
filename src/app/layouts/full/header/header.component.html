@@ -1,0 +1,14 @@
+<button [matMenuTriggerFor]="profile" mat-icon-button class="m-r-10">
+    <img src="assets/images/users/profile.jpg" alt="user" class="profile-pic"> </button>
+<mat-menu #profile="matMenu" class="mymegamenu">
+    <!-- <button mat-menu-item (click)="navigatSetting()">
+        <mat-icon>settings_applications</mat-icon> Settings
+    </button> -->
+    <button mat-menu-item (click)="changePassword()">
+        <mat-icon>vpn_key</mat-icon> Change Password
+    </button>
+    <button mat-menu-item (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon> Logout
+    </button>
+
+</mat-menu>

@@ -1,0 +1,349 @@
+<mat-card *ngIf="isTable">
+  <mat-card-content>
+    <div fxLayout="row wrap">
+      <div fxFlex.gt-md=50 fxFLex.gt-sm=50 fxFlex.gt-xs=50 fxFlex=50>
+        <mat-card-title>Audit Sequence</mat-card-title>
+      </div>
+      <div fxFlex.gt-md=20 fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10">
+        <button mat-raised-button color="primary" class="pull-right" (click)="isAdd = true;isTable = false;">Add
+          Audit Sequence</button>
+      </div>
+      <div fxFlex.gt-md=30 fxFlex.gt-sm="15" fxFlex.gt-xs="10" fxFlex="10">
+        <button mat-raised-button color="warn" class="pull-right" (click)="deletePlants()"
+          [disabled]="!selection?.selected.length" id="deleteButton">Delete Selected Audit</button>
+      </div>
+    
+     
+
+  </div>
+    <div fxLayout="row wrap">
+      
+      
+      <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+        <mat-form-field class="p-r-10">
+          <mat-label>Section</mat-label>
+          <mat-select [(ngModel)]="AuditObj.SectionName"  name="Section" (ngModelChange)="getAreaList()" multiple>
+            <mat-option *ngFor="let section of SectionList" [value]="section">
+              {{section}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+  </div>
+
+  <div fxFlex.gt-md="20" fxFlex.gt-sm="50" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-form-field class="p-r-10">
+      <mat-label>Area</mat-label>
+      <mat-select [(ngModel)]="AuditObj.AreaName" name="AreaName"  (ngModelChange)="getComponentList();" multiple>
+        <mat-option *ngFor="let area of AreaList" [value]="area" >
+          {{area}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  
+  
+  <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-form-field class="p-r-10">
+      <mat-label>Component</mat-label>
+      <mat-select [(ngModel)]="AuditObj.ComponentName" name="ComponentName"  (ngModelChange)="getModelList()" multiple>
+        <mat-option *ngFor="let component of ComponentList" [value]="component">
+          {{component}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-form-field class="p-r-10">
+      <mat-label>Model</mat-label>
+      <mat-select [(ngModel)]="AuditObj.CATModelName" name="ModelName"  (ngModelChange)="getComponents()"multiple>
+        <mat-option *ngFor="let model of ModelList" [value]="model">
+          {{model}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div fxFlex.gt-md='20' fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10">
+    <button mat-raised-button color="primary" class="pull-right" (click)="getAuidsequence()">Get
+      Audit Sequence</button>
+  </div>
+
+    </div>
+
+    <div class="mat-elevation-z8" style="overflow: auto;"> 
+      <mat-paginator [length]="auditsequence.length"[pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+
+      <table mat-table [dataSource]="dataSource" matSort >
+        <ng-container matColumnDef="Select">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()" color="warn"
+              title="Select All">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+              [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)" color="warn">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="AreaName"> 
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>AreaName</th>
+          <td mat-cell *matCellDef="let element">
+            <div *ngIf="element.Area != null">
+            <a (click)="showUpdateForm(element)"
+             style="text-decoration: underline;color: blue; cursor: pointer;"> 
+              {{element.Area.AreaName}}
+            </a> 
+          </div></td>
+          </ng-container>
+
+          
+        <ng-container matColumnDef="SectionName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header >SectionName</th>
+          <td mat-cell *matCellDef="let element" > 
+                <div *ngIf="element.Section != null">
+                 {{element.Section.SectionName}}
+                </div>
+          </td>
+      </ng-container>
+
+      
+      <ng-container matColumnDef="ModelName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header >ModelName</th>
+        <td mat-cell *matCellDef="let element" > 
+              <div *ngIf="element.Model != null">
+               {{element.Model.ModelName}}
+              </div>
+        </td>
+    </ng-container>
+
+        <ng-container matColumnDef="ComponentName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >ComponentName</th>
+            <td mat-cell *matCellDef="let element" > 
+                  <div *ngIf="element.Component != null">
+                   {{element.Component.ComponentName}}
+                  </div>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="InspectionType">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header >Audit name</th>
+            <td mat-cell *matCellDef="let element" > 
+                  <div *ngIf="element.InspectionType != null">
+                   {{element.InspectionType}}
+                    </div>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="SequenceNumber">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>SequenceNumber</th>
+            <td mat-cell *matCellDef="let element">
+              
+              {{element.SequenceNumber}}
+            
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="SerialPrefix">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>SerialPrefix</th>
+              <td mat-cell *matCellDef="let element">
+               
+                {{element.SerialPrefix}}
+              
+              </td>
+            </ng-container>
+            
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+  </mat-card-content>
+</mat-card>
+<div fxLayout="row wrap" *ngIf="isEdit">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Update Audit Sequence </mat-card-title>
+        
+        <form #EditForm="ngForm" (ngSubmit)="updateAudit(EditForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+               
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="auditSequenceList.SectionName" name="SectionName" (ngModelChange)="getAreas();getModel()" required >
+                      <mat-option *ngFor="let model of SectionList" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>AreaName</mat-label>
+                    <mat-select [(ngModel)]="auditSequenceList.AreaName" name="AreaName" (ngModelChange)="getComponents()" required>
+                      <mat-option *ngFor="let area of areaList" [value]="area">
+                        {{area}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Model</mat-label>
+                    <mat-select [(ngModel)]="auditSequenceList.ModelName" name="ModelName"  (ngModelChange)="getComponents()" required>
+                      <mat-option *ngFor="let model of modelList" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Component</mat-label>
+                    <mat-select [(ngModel)]="auditSequenceList.ComponentName" name="ComponentName"(ngModelChange)="getAuditName()" required>
+                      <mat-option *ngFor="let model of componentList" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Audit Name</mat-label>
+                    <mat-select [(ngModel)]="auditSequenceList.InspectionType" name="InspectionType" required>
+                      <mat-option *ngFor="let model of types" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>SequenceNumber</mat-label>
+                    <input matInput  placeholder="SequenceNumber" required [(ngModel)]="auditSequenceList.SequenceNo" name="SequenceNumber">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>SerialPrefix</mat-label>
+                    <input matInput placeholder="SerialPrefix" required [(ngModel)]="auditSequenceList.SerialPrefix" name="SerialPrefix">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button type="submit" class="pull-right" id="save" style="margin-left:10px"
+                    color="primary">Update</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isTable= true;isEdit=false;EditForm.resetForm();">Cancel</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+<div fxLayout="row wrap" *ngIf="isAdd">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Add Audit Sequence </mat-card-title>
+        
+        <form #EditForm="ngForm" (ngSubmit)="addAudit(EditForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                
+                
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="auditSequenceList.SectionName" name="SectionName" (ngModelChange)="getAreas();getModel()" required >
+                      <mat-option *ngFor="let model of SectionList" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>AreaName</mat-label>
+                    <mat-select [(ngModel)]="auditSequenceList.AreaName" name="AreaName" (ngModelChange)="getComponents()" required>
+                      <mat-option *ngFor="let area of areaList" [value]="area">
+                        {{area}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Model</mat-label>
+                    <mat-select [(ngModel)]="auditSequenceList.ModelName" name="ModelName"  (ngModelChange)="getComponents()" required>
+                      <mat-option *ngFor="let model of modelList" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Component</mat-label>
+                    <mat-select [(ngModel)]="auditSequenceList.ComponentName" name="ComponentName" (ngModelChange)="getAuditName()" required>
+                      <mat-option *ngFor="let model of componentList" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Audit Name</mat-label>
+                    <mat-select [(ngModel)]="auditSequenceList.InspectionType" name="InspectionType" required>
+                      <mat-option *ngFor="let model of types" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>SequenceNumber</mat-label>
+                    <input matInput  placeholder="SequenceNumber" required [(ngModel)]="auditSequenceList.SequenceNo" name="SequenceNumber">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>SerialPrefix</mat-label>
+                    <input matInput placeholder="SerialPrefix" required [(ngModel)]="auditSequenceList.SerialPrefix" name="SerialPrefix">
+                  </mat-form-field>
+                </div>
+
+                         <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button type="submit" class="pull-right" id="save" style="margin-left:10px"
+                    color="primary">save</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isTable=true;isAdd=false;EditForm.resetForm();">Cancel</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

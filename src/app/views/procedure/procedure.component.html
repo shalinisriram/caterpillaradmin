@@ -1,0 +1,777 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<div fxLayout="row wrap" *ngIf="isTable">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <div fxLayout="row" style="padding: 0rem,0rem,1rem,0rem">
+          <div style="width:30%">
+            <mat-card-title>Procedures</mat-card-title>
+          </div>
+          <!-- <div fxFlex.gt-sm="19" fxFlex.gt-xs="20" fxFlex="20" class="p-r-20">
+            <mat-form-field>
+              <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+            </mat-form-field>
+          </div> -->
+          <div style="width:15%">
+            <button mat-raised-button color="primary" class="pull-right" (click)="isAdd = true;isTable = false">Add Procedure</button>
+          </div>
+        
+          <div style="width:20%">
+            <button mat-raised-button color="warn" class="pull-right" (click)="deleteProcedures()"
+              [disabled]="!selection?.selected.length" id="deleteButton">Delete Selected Procedures</button>
+          </div>
+          <div style="width:15%">
+              <button mat-raised-button id="exportButton" color="primary" class="pull-right" (click)="exportProcedureXLSX('excel')">Export To Excel</button>
+          </div>
+          <div style="width:15%">
+            <button mat-raised-button id="exportButton" color="primary" class="pull-right" (click)="exportProcedureXLSX('pdf')">Export To Pdf</button>
+        </div>
+          <div fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10">
+            
+        </div>
+        </div>
+        <div fxLayout="row wrap">
+
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Section</mat-label>
+              <mat-select [(ngModel)]="procedureObj.SectionName" name="Section" (ngModelChange)="getAreaList();getModelList()"
+                >
+                <mat-option *ngFor="let section of SectionList" [value]="section">
+                  {{section}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Area</mat-label>
+              <mat-select [(ngModel)]="procedureObj.AreaName" #select5 name="AreaName" (ngModelChange)="getVersionList();"
+                multiple>
+                <div class="select-all">
+                  <mat-checkbox [(ngModel)]="allSelected"
+                                  [ngModelOptions]="{standalone: true}"
+                                  (change)="toggleAllSelection(select5)">Select All</mat-checkbox>
+              </div>
+                <mat-option *ngFor="let area of AreaList" [value]="area">
+                  {{area}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+          </div>
+
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Model</mat-label>
+              <mat-select [(ngModel)]="procedureObj.ModelName" name="ModelName" (ngModelChange)="getComponentList()"
+                >
+                <mat-option *ngFor="let model of ModelList" [value]="model">
+                  {{model}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          
+          
+
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Component</mat-label>
+              <mat-select [(ngModel)]="procedureObj.ComponentName" name="ComponentName"
+                (ngModelChange)="getVersionList();" >
+                <mat-option *ngFor="let component of ComponentList" [value]="component">
+                  {{component}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+          </div>
+
+          
+
+          
+          <div fxFlex.gt-md="15" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Version</mat-label>
+              <mat-select [(ngModel)]="procedureObj.Version" name="Version"  >
+                <mat-option *ngFor="let version of versionList" [value]="version">
+                  {{version}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex.gt-md="5" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <button mat-raised-button id="button" color="primary" class="pull-right" (click)="getProcedures()">Get Procedure</button>
+            <!-- <button matTooltip="Default" mat-icon-button style="background-color:lightblue;"
+            class="pull-right" (click)="setDefault()">
+                <mat-icon>refresh</mat-icon>
+              </button> -->
+          </div>
+        </div>
+
+        <div class="mat-elevation-z8" style="overflow: auto;">
+          <mat-paginator [pageSizeOptions]="[10,20,50,100]" [pageSize] ="pageLimit" [pageIndex] = "pageIndex"
+           showFirstLastButtons (page)="refreshPage($event)"></mat-paginator>
+          <table mat-table [dataSource]="dataSource" multiTemplateDataRows>
+            <ng-container matColumnDef="Select">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+                  [checked]="selection.hasValue() && isAllSelected()"
+                  [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()" color="warn"
+                  title="Select All">
+                </mat-checkbox>
+              </th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                  [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)" color="warn">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+           											
+
+            <!-- Position Column -->
+            <ng-container matColumnDef="SequenceNumber">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%;padding: 0rem">Sequence</th>
+              <td mat-cell *matCellDef="let element" style="width:5%" ><a (click)="showUpdateForm(element)"
+                  style="color:blue;cursor: pointer; text-decoration: underline">{{element.SequenceNumber}}</a> </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="Description" >
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:10%"> Description </th>
+              <td mat-cell *matCellDef="let element" style="width:10%"> {{element.Description}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Time">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%" > Time(min) </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.Time}} </td>
+            </ng-container>
+
+            
+            <ng-container matColumnDef="Operator">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%"> Operator </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.Operator}} </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="WeldProcedure">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%" >Weld Procedure </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.WeldProcedure}} </td>
+            </ng-container>
+            <ng-container matColumnDef="WeldLength">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">Weld Length</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.WeldLength}} </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="ProcedureDate">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%" >Procedure Date</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.ProcedureDate|date:'dd-MMM-yy h:mm:ss'}} </td>
+            </ng-container>
+            <!-- <ng-container matColumnDef="Figure">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">Figure</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.Figure}} </td>
+            </ng-container>
+            <ng-container matColumnDef="PvaFolder">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">PvaFolder</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.PvaFolder}} </td>
+            </ng-container> -->
+            <ng-container matColumnDef="WeldProcess">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">Weld Process</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.WeldProcess}} </td>
+            </ng-container>
+            <ng-container matColumnDef="WireDiameter">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">Wire Diameter</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.WireDiameter}} </td>
+            </ng-container>
+            <ng-container matColumnDef="WeldPosition">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">Weld Position</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.WeldPosition}} </td>
+            </ng-container>
+            <ng-container matColumnDef="WeldSize">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">Weld Size</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.WeldSize}} </td>
+            </ng-container>
+            <ng-container matColumnDef="WeldType">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">Weld Type</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.WeldType}} </td>
+            </ng-container>
+            <ng-container matColumnDef="WireFeedSpeed">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">Wire FeedSpeed</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.WireFeedSpeed}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Voltage">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">Voltage</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.Voltage}} </td>
+            </ng-container>
+            <ng-container matColumnDef="WeldVolume">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">Weld Volume</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.WeldVolume}} </td>
+            </ng-container>
+            <ng-container matColumnDef="WeldId">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">Weld Id</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element.WeldID}} </td>
+            </ng-container>
+            <ng-container matColumnDef="FigureVisual">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">Figure Visual </th>
+              
+              <td mat-cell *matCellDef="let element" style="width:5%"><a (click)="openImageModal(element)"
+                style="color:blue;cursor: pointer; text-decoration: underline"> {{element.FigureVisual}}</a></td>
+              </ng-container>
+              
+              <ng-container matColumnDef="Version">
+                <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">Version </th>
+                <td mat-cell *matCellDef="let element" style="width:5%"> {{element.Version}} </td>
+              </ng-container>
+              <ng-container matColumnDef="ECRNumber">
+                <th mat-header-cell *matHeaderCellDef class="font" style="width:5%" > ECRNumber </th>
+                <td mat-cell *matCellDef="let element" style="width:5%"> {{element.ECRNumber}} </td>
+              </ng-container>
+              <ng-container matColumnDef="uploadTime">
+                <th mat-header-cell *matHeaderCellDef class="font" style="width:5%" > UploadTime </th>
+                <td mat-cell *matCellDef="let element" style="width:5%"> {{element.CreatedTimeStamp}} </td>
+              </ng-container>
+              
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap" *ngIf="isAdd">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Add Procedure</mat-card-title>
+        <form #addForm="ngForm" (ngSubmit)="addProcedure(addForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <!-- <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="procedure.SectionName" (ngModelChange)="getModels()" name="SectionName"
+                      required>
+                      <mat-option *ngFor="let section of SectionList" [value]="section">
+                        {{section}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Model</mat-label>
+                    <mat-select [(ngModel)]="procedure.ModelName" name="ModelName" (ngModelChange)="getComponents()"
+                      required>
+                      <mat-option *ngFor="let model of modelList" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Area</mat-label>
+                    <mat-select [(ngModel)]="procedure.AreaName" name="AreaName" required
+                      (ngModelChange)="getComponents()" multiple>
+                      <mat-option *ngFor="let area of areaList" [value]="area" required>
+                        {{area}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Component</mat-label>
+                    <mat-select [(ngModel)]="procedure.ComponentName" name="ComponentName" required>
+                      <mat-option *ngFor="let component of componentList" [value]="component" required>
+                        {{component}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div> -->
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-label>Image Upload</mat-label><br>
+                  <div *ngIf="isSpinnerImage">
+                    <mat-spinner></mat-spinner>
+                  </div>
+                  <input type="file" (change)="onFileChanged($event)" accept=".jpg" multiple required>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <br>
+                  <mat-label>Excel File Upload</mat-label><br>
+                  <input type="file" (change)="onFileChangedCsv($event)" accept=".xlsx" multiple required>
+                </div>
+               
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button type="submit" class="pull-right" id="save" style="margin-left:10px"
+                    color="primary" [disabled]="!addForm.valid">Save</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isAdd = !isAdd;isTable = true;getProcedures();addForm.resetForm();">Cancel</button>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+                    <a href="assets/images/readme.txt" download="readme.txt" title="readme"><span>
+                        <pre>Read me before Add Procedure!</pre></span></a>
+                  </div>
+
+                  <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+                    <a href="https://catweapi.azurewebsites.net/api/admin/ProcedureTemplate" title="Sample Template">
+                      <span>
+                        <pre>Add Procedure - Sample Template</pre></span></a>
+                  </div>
+                 
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </form>
+          <mat-label *ngIf="isSpinner">{{progressMessage}}</mat-label>
+          <mat-progress-bar mode="determinate" *ngIf="isSpinner" [value] ="progressvalue" ></mat-progress-bar>
+      </mat-card-content>
+      
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap" *ngIf="isInsert">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Insert Procedure row</mat-card-title>
+        <form #InsertForm="ngForm" (ngSubmit)="insertRowSEquence(InsertForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="Insert.SectionName" (ngModelChange)="getModels()" name="SectionName"
+                      required>
+                      <mat-option *ngFor="let section of SectionList" [value]="section">
+                        {{section}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Model</mat-label>
+                    <mat-select [(ngModel)]="Insert.ModelName" name="ModelName" (ngModelChange)="getComponents()"
+                      required>
+                      <mat-option *ngFor="let model of modelList" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Area</mat-label>
+                    <mat-select [(ngModel)]="Insert.AreaName" #select6 name="AreaName" required
+                      (ngModelChange)="getComponents()" multiple>
+                      <div class="select-all">
+                        <mat-checkbox [(ngModel)]="allSelected"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="toggleAllSelection(select6)">Select All</mat-checkbox>
+                    </div>
+                      <mat-option *ngFor="let area of areaList" [value]="area" required>
+                        {{area}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Component</mat-label>
+                    <mat-select [(ngModel)]="Insert.ComponentName" name="ComponentName" required (ngModelChange)="getVersionList()" >
+                      <mat-option *ngFor="let component of componentList" [value]="component" required>
+                        {{component}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Version</mat-label>
+                    <mat-select [(ngModel)]="Insert.Version" name="version" required>
+                      <mat-option *ngFor="let version of versionList" [value]="version">
+                        {{version}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-label>Image Upload</mat-label><br>
+                  <div *ngIf="isSpinnerImage">
+                    <mat-spinner></mat-spinner>
+                  </div>
+                  <input type="file" (change)="onFileChanged($event)" accept=".jpg" multiple required>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <br>
+                  <mat-label>Excel File Upload</mat-label><br>
+                  <input type="file" (change)="onFileChangedCsv($event)" accept=".xlsx" multiple required>
+                </div>
+               
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button type="submit" class="pull-right" id="save" style="margin-left:10px"
+                    color="primary" [disabled]="!InsertForm.valid">Save</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isInsert = !isInsert;isTable = true;getProcedures();InsertForm.resetForm();">Cancel</button>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+                    <a href="assets/images/readme.txt" download="readme.txt" title="readme"><span>
+                        <pre>Read me before Add Procedure!</pre></span></a>
+                  </div>
+
+                  <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+                    <a href="https://newwebapi.azurewebsites.net/api/admin/ProcedureTemplate" title="Sample Template">
+                      <span>
+                        <pre>Add Procedure - Sample Template</pre></span></a>
+                  </div>
+                 
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </form>
+          <mat-label *ngIf="isSpinner">{{progressMessage}}</mat-label>
+          <mat-progress-bar mode="determinate" *ngIf="isSpinner" [value] ="progressvalue" ></mat-progress-bar>
+      </mat-card-content>
+      
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap" *ngIf="isAddECM">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Add ECR </mat-card-title>
+        <form #addForm="ngForm" (ngSubmit)="addEcr(addForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Ecr Number</mat-label>
+                    <input matInput placeholder="Username"  [(ngModel)]="ecr.EcrNumber" name="ecrnumber" 
+                      required>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="ecr.SectionName" (ngModelChange)="getModels()" name="SectionName"
+                      required>
+                      <mat-option *ngFor="let section of SectionList" [value]="section">
+                        {{section}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Model</mat-label>
+                    <mat-select [(ngModel)]="ecr.ModelName" name="ModelName" (ngModelChange)="getComponents()"
+                      required>
+                      <mat-option *ngFor="let model of modelList" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Area</mat-label>
+                    <mat-select [(ngModel)]="ecr.AreaName" #select7 name="AreaName" required
+                      (ngModelChange)="getComponents()" multiple>
+                      <div class="select-all">
+                        <mat-checkbox [(ngModel)]="allSelected"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="toggleAllSelection(select7)">Select All</mat-checkbox>
+                    </div>
+                      <mat-option *ngFor="let area of areaList" [value]="area" required>
+                        {{area}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Component</mat-label>
+                    <mat-select [(ngModel)]="ecr.ComponentName" name="ComponentName" required>
+                      <mat-option *ngFor="let component of componentList" [value]="component" required>
+                        {{component}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-label>Image Upload</mat-label><br>
+                  <input type="file" (change)="onFileChanged($event)" accept="image/.jpg" multiple required>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <br>
+                  <mat-label>Excel File Upload</mat-label><br>
+                  <input type="file" (change)="onFileChangedCsv($event)" accept=".xlsx" multiple required>
+                </div>
+               
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button type="submit" class="pull-right" id="save" style="margin-left:10px"
+                    color="primary">Save</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isAddECM= !isAddECM;isTable = true;getProcedures();addForm.resetForm();">Cancel</button>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+                    <a href="assets/images/readme.txt" download="readme.txt" title="readme"><span>
+                        <pre>Read me before Add Procedure!</pre></span></a>
+                  </div>
+
+                  <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+                    <a href="https://newwebapi.azurewebsites.net/api/admin/ProcedureTemplate" title="Sample Template">
+                      <span>
+                        <pre>Add Procedure - Sample Template</pre></span></a>
+                  </div>
+                 
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </form>
+          <mat-label *ngIf="isSpinner">{{progressMessage}}</mat-label>
+          <mat-progress-bar mode="determinate" *ngIf="isSpinner" [value] ="progressvalue" ></mat-progress-bar>
+      </mat-card-content>
+      
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap" *ngIf="isEdit">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Edit Procedure </mat-card-title>
+        <mat-card-subtitle>SequenceNumber - {{procedure.SequenceNumber}}	</mat-card-subtitle>
+        <form #EditForm="ngForm" (ngSubmit)="updateProcedure(EditForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="procedure.SectionName" (ngModelChange)="getModels()" name="SectionName"
+                      required>
+                      <mat-option *ngFor="let section of SectionList" [value]="section">
+                        {{section}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Model</mat-label>
+                    <mat-select [(ngModel)]="procedure.ModelName" name="ModelName" (ngModelChange)="getComponents()"
+                      required>
+                      <mat-option *ngFor="let model of modelList" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Area</mat-label>
+                    <mat-select [(ngModel)]="procedure.AreaName" #select8 name="AreaName" required
+                      (ngModelChange)="getComponents()" multiple>
+                      <div class="select-all">
+                        <mat-checkbox [(ngModel)]="allSelected"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="toggleAllSelection(select8)">Select All</mat-checkbox>
+                    </div>
+                      <mat-option *ngFor="let area of areaList" [value]="area" required>
+                        {{area}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Component</mat-label>
+                    <mat-select [(ngModel)]="procedure.ComponentName" name="ComponentName" required>
+                      <mat-option *ngFor="let component of componentList" [value]="component" required>
+                        {{component}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Time,min" [(ngModel)]="procedure.Time" name="Time">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Operator" [(ngModel)]="procedure.Operator" name="Operator">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Weld Procedure" [(ngModel)]="procedure.WeldProcedure"
+                      name="WeldProcedure">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <mat-form-field>
+                      <input matInput placeholder="Weld Length" [(ngModel)]="procedure.WeldLength" name="WeldLength">
+                    </mat-form-field>
+                  </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <mat-form-field>
+                      <input matInput placeholder="ProcedureDate" [(ngModel)]="procedure.ProcedureDate"
+                        name="ProcedureDate">
+                    </mat-form-field>
+                </div>
+                <!-- <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <mat-form-field>
+                      <input matInput placeholder="Figure" [(ngModel)]="procedure.Figure"
+                        name="Figure">
+                    </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <mat-form-field>
+                      <input matInput placeholder="PvaFolder" [(ngModel)]="procedure.PvaFolder"
+                        name="PvaFolder">
+                    </mat-form-field>
+                </div> -->
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Weld Process" [(ngModel)]="procedure.WeldProcess" name="WeldProcess">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <mat-form-field>
+                      <input matInput placeholder="Wire Diameter" [(ngModel)]="procedure.WireDiameter" name="WireDiameter">
+                    </mat-form-field>
+                  </div>
+  
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Weld Position" [(ngModel)]="procedure.WeldPosition"
+                      name="WeldPosition">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Weld Size" [(ngModel)]="procedure.WeldSize" name="WeldSize">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Weld Type" [(ngModel)]="procedure.WeldType" name="WeldType">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                    <mat-form-field>
+                      <input matInput placeholder="Wire FeedSpeed" [(ngModel)]="procedure.WireFeedSpeed" name="WireFeedSpeed">
+                    </mat-form-field>
+                  </div>
+                  <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                      <mat-form-field>
+                        <input matInput placeholder="Voltage" [(ngModel)]="procedure.Voltage" name="Voltage">
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                        <mat-form-field>
+                          <input matInput placeholder="WeldVolume" [(ngModel)]="procedure.WeldVolume" name="WeldVolume">
+                        </mat-form-field>
+                      </div>
+                <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+                  <mat-form-field>
+                    <input matInput placeholder="Figure Visual" [(ngModel)]="procedure.FigureVisual"
+                      name="FigureVisual">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+                    <input type="file" name="imageFile"  (change)="onImageChange($event)" accept=".jpg" multiple>
+                </div>
+
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <textarea matInput placeholder="Description" [(ngModel)]="procedure.Description"
+                      name="Description"></textarea>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button type="submit" class="pull-right" id="save" style="margin-left:10px"
+                    color="primary">Update</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="showTable();EditForm.resetForm();">Cancel</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

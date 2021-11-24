@@ -1,0 +1,146 @@
+<div fxLayout="row wrap" *ngIf="isTable">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <div fxLayout="row wrap">
+          <div fxFlex.gt-sm="30" fxFlex.gt-xs="30" fxFlex="30">
+            <mat-card-title>
+              Work Station
+            </mat-card-title>
+          </div>
+          <div fxFlex.gt-sm="30" fxFlex.gt-xs="30" fxFlex="30">
+            <mat-form-field>
+              <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+            </mat-form-field>
+          </div>
+          <div fxFlex.gt-sm="40" fxFlex.gt-xs="40" fxFlex="40">
+            <button mat-raised-button color="primary" class="pull-right"
+              (click)="isAdd = true;isTable = false">Add</button>
+          </div>
+        </div>
+        <div class="responsive-table">
+          <table mat-table [dataSource]="dataSource">
+
+            <!-- Position Column -->
+            <ng-container matColumnDef="Id">
+              <th mat-header-cell *matHeaderCellDef class="font">ID</th>
+              <td mat-cell *matCellDef="let element"> {{element.Id}} </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="WorkStationName">
+              <th mat-header-cell *matHeaderCellDef class="font"> Workstation Name</th>
+              <td mat-cell *matCellDef="let element"> {{element.WorkStationName}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Name">
+              <th mat-header-cell *matHeaderCellDef class="font">Plant Name </th>
+              <td mat-cell *matCellDef="let element"> {{element.Name}} </td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="IsActive">
+              <th mat-header-cell *matHeaderCellDef class="font">Status</th>
+              <td mat-cell *matCellDef="let element"> {{element.IsActive?'Active':'Inactive'}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Action">
+              <th mat-header-cell *matHeaderCellDef class="font">Action</th>
+              <td mat-cell *matCellDef="let element"><span><i class="material-icons" (click)="showUpdateForm(element)"
+                    style="color:green;cursor: pointer;"> edit</i><i class="material-icons"
+                    (click)="deleteWorkStations(element)" style="color:red;cursor: pointer;"> delete </i></span></td>
+            </ng-container>
+
+            <!-- Symbol Column -->
+
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+          <mat-paginator [pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+        </div>
+        <!-- <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator> -->
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+
+
+<div fxLayout="row wrap" *ngIf="isAdd">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>
+          Add Work Station
+        </mat-card-title>
+        <form [formGroup]="form" (ngSubmit)="AddWorkStation()">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Input" [(ngModel)]="workstation.WorkStationName"
+                      [formControl]="form.controls['WorkStationName']" name="PlantName">
+                  </mat-form-field>
+                  <small
+                    *ngIf="form.controls['WorkStationName'].hasError('required') && form.controls['WorkStationName'].touched"
+                    class="text-danger support-text">WorkStationName is required.</small>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Plant Name</mat-label>
+                    <mat-select [(ngModel)]="workstation.PlantName" [formControl]="form.controls['PlantName']"
+                      name="PlantName">
+                      <mat-option *ngFor="let cm of calplantlist" [value]="cm.PlantName">
+                        {{cm.PlantName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <small *ngIf="form.controls['PlantName'].hasError('required') && form.controls['PlantName'].touched"
+                    class="text-danger support-text">PlantName is required.</small>
+                </div>
+                <img [src]="url" height="200"> <br />
+                <input type='file' (change)="onSelectFile($event)">
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" style="margin-left:10px"
+                    class="pull-right">Save</button>
+                  <button mat-raised-button color="warn" type="button" class="pull-right"
+                    (click)="isAdd = false;isTable = true">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+<div fxLayout="row wrap" *ngIf="isEdit">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Edit Plant</mat-card-title>
+        <form (ngSubmit)="UpdateWorkStation()">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Plant Name" [(ngModel)]="editworkstation.PlantName" name="plantName">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right"
+                    style="margin-left:10px">Update</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isTable = true; isEdit = false">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -1,0 +1,397 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<div fxLayout="row wrap" *ngIf="isTable">
+  <div fxFlex.gt-md=100 fxFlex.gt-sm=100 fxFlex.gt-xs=100 fxFlex=100>
+    <mat-card>
+      <mat-card-content>
+
+        <div fxLayout="row wrap">
+          <div style="width:60%">
+            <mat-card-title>Traceability</mat-card-title>
+          </div>
+          <!-- <div fxFlex.gt-md="20" fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10">
+            <mat-form-field>
+              <input matInput (keyup)="applyFilter($event)" placeholder="Search">
+            </mat-form-field>
+          </div> -->
+          <div style="width:20%">
+            <button mat-raised-button id="exportButton" class="pull-right" (click)="exportAsXLSX()">Export To Excel</button>
+          </div>
+
+          <!-- <div style="width:20%">
+            
+            <button mat-raised-button color="primary" class="pull-right" (click)="isTable = !isTable">Show Chart</button>
+          </div> -->
+          <div style="width:20%">
+            <button mat-raised-button id="button" color="primary" class="pull-right" (click)="gettracability()">Get Traceability</button>
+          </div>
+        </div>
+
+        <div fxLayout="row wrap">
+
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                <mat-form-field class="p-r-10">
+                  <mat-label>Section</mat-label>
+                  <mat-select [(ngModel)]="traceabilityObj.SectionName" #select1 multiple name="Section" 
+                  (ngModelChange)="getAreaList();" >
+                  <div class="select-all">
+                    <mat-checkbox [(ngModel)]="allSelected"
+                                    [ngModelOptions]="{standalone: true}"
+                                    (change)="toggleAllSelection(select1)">Select All</mat-checkbox>
+                </div>
+                    <mat-option *ngFor="let section of SectionList" [value]="section">
+                      {{section}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+          </div>
+
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="50" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Area</mat-label>
+              <mat-select [(ngModel)]="traceabilityObj.AreaName" #select2 name="AreaName" multiple (ngModelChange)="getComponentList();">
+                <div class="select-all">
+                  <mat-checkbox [(ngModel)]="allSelected"
+                                  [ngModelOptions]="{standalone: true}"
+                                  (change)="toggleAllSelection(select2)">Select All</mat-checkbox>
+              </div>
+                <mat-option *ngFor="let area of AreaList" [value]="area" >
+                  {{area}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Component</mat-label>
+              <mat-select [(ngModel)]="traceabilityObj.ComponentName" #select3 name="ComponentName" multiple (ngModelChange)="getModelList();">
+                <div class="select-all">
+                  <mat-checkbox [(ngModel)]="allSelected"
+                                  [ngModelOptions]="{standalone: true}"
+                                  (change)="toggleAllSelection(select3)">Select All</mat-checkbox>
+              </div>
+                <mat-option *ngFor="let component of ComponentList" [value]="component">
+                  {{component}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Model</mat-label>
+              <mat-select [(ngModel)]="traceabilityObj.CATModelName" #select4 name="ModelName" multiple (ngModelChange)="getLineLoadNumbers()">
+                <div class="select-all">
+                  <mat-checkbox [(ngModel)]="allSelected"
+                                  [ngModelOptions]="{standalone: true}"
+                                  (change)="toggleAllSelection(select4)">Select All</mat-checkbox>
+              </div>
+                <mat-option *ngFor="let model of ModelList" [value]="model">
+                  {{model}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          
+
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Line Load Number</mat-label>
+              <mat-select [(ngModel)]="traceabilityObj.LineLoadNumber" #select5 name="LineLoadNumber" multiple >
+                <div class="select-all">
+                  <mat-checkbox [(ngModel)]="allSelected"
+                                  [ngModelOptions]="{standalone: true}"
+                                  (change)="toggleAllSelection(select5)">Select All</mat-checkbox>
+              </div>
+                <mat-option *ngFor="let lineLoadNumber of lineLoadNumbers" [value]="lineLoadNumber">
+                  {{lineLoadNumber}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+        </div>
+
+        <div class="mat-elevation-z8" style="overflow: auto;">
+          <mat-paginator [pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+          <table mat-table [dataSource]="dataSource" matSort >
+            <ng-container matColumnDef="SequenceNumber">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Sequence</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element?.procedure?.SequenceNumber}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Description">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Description </th>
+              <td mat-cell *matCellDef="let element"> {{element?.procedure?.Description}} </td>
+            </ng-container>
+            <ng-container matColumnDef="AreaName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Area </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element?.AreaNames?.AreaName}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Operator">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Operator </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element?.procedure?.Operator}} </td>
+            </ng-container>
+            <ng-container matColumnDef="WeldProcedure">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Weld Procedure </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element?.procedure?.WeldProcedure}} </td>
+            </ng-container>
+            <ng-container matColumnDef="PvaFolder">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Pva Folder </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element?.procedure?.PvaFolder}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Approval">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Quality Approval </th>
+              <td mat-cell *matCellDef="let element" style="width:5%">
+                <ul *ngFor = "let item of element.QualityAudit">
+                  {{item.Approval}}
+                </ul>  </td>
+            </ng-container>
+            <ng-container matColumnDef="Id">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> QualityAudit Id </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> 
+                <ul *ngFor = "let item of element.QualityAudit">
+                  {{item.Id}}
+                </ul>  </td> 
+            </ng-container>
+            <ng-container matColumnDef="LoginId">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Quality LoginId </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> 
+                <ul *ngFor = "let item of element.QualityAudit">
+                  {{item.LoginId}}
+                </ul>  </td> 
+            </ng-container>
+            <ng-container matColumnDef="QualityInstructionsId">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> QualityInstructions Id  </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> <ul *ngFor = "let item of element.QualityAudit">
+                {{item.QualityInstructionsId}}
+              </ul>  </td> 
+            </ng-container>
+            <ng-container matColumnDef="StatusId">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> QualityAudit StatusId </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> <ul *ngFor = "let item of element.QualityAudit">
+                {{item.StatusId}}
+              </ul>  </td> 
+            </ng-container>
+            <ng-container matColumnDef="WeldProcess">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Weld Process </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element?.procedure?.WeldProcess}} </td>
+            </ng-container>
+            <ng-container matColumnDef="WireDiameter">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Wire Diameter </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element?.procedure?.WireDiameter}} </td>
+            </ng-container>
+            <ng-container matColumnDef="WeldPosition">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Weld Position </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element?.procedure?.WeldPosition}} </td>
+            </ng-container>
+            <ng-container matColumnDef="WeldSize">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Weld Size </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element?.procedure?.WeldSize}} </td>
+            </ng-container>
+            <ng-container matColumnDef="WeldType">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Weld Type </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element?.procedure?.WeldType}} </td>
+            </ng-container>
+            <ng-container matColumnDef="WireFeedSpeed">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Wire Feed Speed </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element?.procedure?.WireFeedSpeed}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Voltage">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Voltage </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element?.procedure?.Voltage}} </td>
+            </ng-container>
+            <ng-container matColumnDef="FigureVisual">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Figure Visual </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"><a (click)="openImageModal(element)"
+                style="color:blue;cursor: pointer; text-decoration: underline"> {{element?.procedure?.FigureVisual}} </a></td>
+            </ng-container>
+            <ng-container matColumnDef="WeldVolume">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%"> Weld Volume </th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element?.procedure?.WeldVolume}} </td>
+            </ng-container>
+            <ng-container matColumnDef="LineLoadNumber">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> Line Load Number </th>
+              <td mat-cell *matCellDef="let element" style="width:10%"> {{element?.LineLoadNumbers?.LineLoadNumber}}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="SectionName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> Section </th>
+              <td mat-cell *matCellDef="let element" style="width:10%"> {{element?.LineLoadNumbers?.SectionName}}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="ModelName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> Model </th>
+              <td mat-cell *matCellDef="let element" style="width:10%"> {{element?.LineLoadNumbers?.ModelName}}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="ComponentName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> Component </th>
+              <td mat-cell *matCellDef="let element" style="width:10%"> {{element?.LineLoadNumbers?.ComponentName}}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="EffectiveDate">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> EffectiveDate </th>
+              <td mat-cell *matCellDef="let element" style="width:10%"> {{element?.LineLoadNumbers?.CreatedTimeStamp}}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="EngineeringChange">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> EngineeringChange </th>
+              <td mat-cell *matCellDef="let element" style="width:10%"> {{element?.procedure?.EChangeRecordId}}
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="SerialNumber">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> Serial Number </th>
+              <td mat-cell *matCellDef="let element" style="width:5%">
+                {{element?.LineLoadNumbers?.SerialNumber}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="PartNumber">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> Part Number </th>
+              <td mat-cell *matCellDef="let element" style="width:5%">
+                {{element?.PartNumber?.PartNumberName}} </td>
+            </ng-container>
+            <ng-container matColumnDef="PartNumber_EngineeringChange">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> PartNumber_EngineeringChange </th>
+              <td mat-cell *matCellDef="let element" style="width:5%">
+                {{element?.PartNumber?.EngineeringChange}} </td>
+            </ng-container>
+            <ng-container matColumnDef="HeatCodeInfo">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> HeatCodeInfo </th>
+              <td mat-cell *matCellDef="let element" style="width:5%">
+                {{element?.PartNumber?.HeatCodeInfo}} </td>
+            </ng-container>
+            <ng-container matColumnDef="FoundryMarking">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> FoundryMarking </th>
+              <td mat-cell *matCellDef="let element" style="width:5%">
+                {{element?.PartNumber?.FoundryMarking}} </td>
+            </ng-container>
+            <ng-container matColumnDef="PartSerialNumber">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> SerialNumber </th>
+              <td mat-cell *matCellDef="let element" style="width:5%">
+                {{element?.PartNumber?.SerialNumber}} </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="UserName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%">User</th>
+              <td mat-cell *matCellDef="let element" style="width:5%"> {{element?.LineLoadNumbers?.UserName}} </td>
+            </ng-container>
+            <ng-container matColumnDef="Time">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> Target Time </th>
+              <td mat-cell *matCellDef="let element" style="width:10%"> {{element?.procedure?.Time}} </td>
+            </ng-container>
+            <ng-container matColumnDef="CompletedTime">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> Time Taken </th>
+              <td mat-cell *matCellDef="let element" style="width:10%"> {{element?.CompletedTime}} </td>
+            </ng-container>
+            <ng-container matColumnDef="StartTime">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:20%"> Start Time </th>
+              <td mat-cell *matCellDef="let element" style="width:20%"> {{element?.checkedOut?.StartTime|date:'dd-MMM-yy h:mm:ss'}} </td>
+            </ng-container>
+            <ng-container matColumnDef="EndTime">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> End Time </th>
+              <td mat-cell *matCellDef="let element" style="width:10%">
+                {{element.Completed?.StartTime|date:'dd-MMM-yy h:mm:ss' }} </td>
+            </ng-container>
+            <ng-container matColumnDef="Notes">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:10%"> Notes </th>
+              <td mat-cell *matCellDef="let element" style="width:10%">
+                {{element.UserTexts}} </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap" *ngIf="!isTable">
+  <div fxFlex.gt-md=100 fxFlex.gt-sm=100 fxFlex.gt-xs=100 fxFlex=100>
+    <mat-card>
+      <mat-card-content>
+        <div fxLayout="row wrap">
+          <div fxFlex.gt-sm="40" fxFlex.gt-xs="30" fxFlex="30">
+            <mat-card-title>Traceability (Target Time vs Final Time)</mat-card-title>
+          </div>
+          <div fxFlex.gt-sm="50" fxFlex.gt-xs="40" fxFlex="40"></div>
+          <div fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10">
+            <button mat-raised-button color="primary" class="pull-right"
+              (click)="isTable = !isTable;gettracability();">Show
+              Table</button>
+          </div>
+        </div>
+        <div fxLayout="row wrap">
+
+            <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="traceabilityObj.SectionName" name="Section" (ngModelChange)="getAreaList();getLineLoadNumbers()">
+                      <mat-option *ngFor="let section of SectionList" [value]="section">
+                        {{section}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+            </div>
+  
+            <div fxFlex.gt-md="20" fxFlex.gt-sm="50" fxFlex.gt-xs="100" fxFlex="100">
+              <mat-form-field class="p-r-10">
+                <mat-label>Area</mat-label>
+                <mat-select [(ngModel)]="traceabilityObj.AreaName" name="AreaName" (ngModelChange)="getComponentList();getLineLoadNumbers()">
+                  <mat-option *ngFor="let area of AreaList" [value]="area">
+                    {{area}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+  
+            <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+              <mat-form-field class="p-r-10">
+                <mat-label>Component</mat-label>
+                <mat-select [(ngModel)]="traceabilityObj.ComponentName" name="ComponentName" (ngModelChange)="getModelList();getLineLoadNumbers()">
+                  <mat-option *ngFor="let component of ComponentList" [value]="component">
+                    {{component}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+  
+            <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+              <mat-form-field class="p-r-10">
+                <mat-label>Model</mat-label>
+                <mat-select [(ngModel)]="traceabilityObj.CATModelName" name="ModelName" (ngModelChange)="getLineLoadNumbers()">
+                  <mat-option *ngFor="let model of ModelList" [value]="model">
+                    {{model}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+  
+            <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+              <mat-form-field class="p-r-10">
+                <mat-label>Line Load Number</mat-label>
+                <mat-select [(ngModel)]="traceabilityObj.LineLoadNumber" name="LineLoadNumber" (ngModelChange)="gettracability()">
+                  <mat-option *ngFor="let lineLoadNumber of lineLoadNumbers" [value]="lineLoadNumber">
+                    {{lineLoadNumber}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+  
+          </div>
+        <div fxLayout="row wrap">
+          <div fxFlex.gt-md=100 fxFlex.gt-sm=100 fxFlex.gt-xs=100 fxFlex=100>
+            <ngx-charts-area-chart [view]="view" [scheme]="colorScheme" [legend]="legend"
+              [showXAxisLabel]="showXAxisLabel" [showYAxisLabel]="showYAxisLabel" [xAxis]="xAxis" [yAxis]="yAxis"
+              [xAxisLabel]="xAxisLabel" [yAxisLabel]="yAxisLabel" [timeline]="timeline" [results]="chartData"
+              (select)="onSelect($event)" [showGridLines]="false">
+            </ngx-charts-area-chart>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+

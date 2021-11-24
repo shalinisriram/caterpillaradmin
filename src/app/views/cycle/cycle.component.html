@@ -1,0 +1,208 @@
+<mat-card *ngIf="isTable">
+  <mat-card-content>
+    <div fxLayout="row wrap">
+      <div fxFlex.gt-md=50 fxFLex.gt-sm=50 fxFlex.gt-xs=50 fxFlex=50>
+        <mat-card-title>Cycle Time</mat-card-title>
+      </div>
+      <div fxFlex.gt-md=20 fxFLex.gt-sm=40 fxFlex.gt-xs=40 fxFlex=40>
+        <mat-form-field>
+          <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+        </mat-form-field>
+      </div>
+      <div fxFlex.gt-md=10 fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10">
+        <button mat-raised-button color="primary" class="pull-right" (click)="isAdd = true;isTable = false;">Add
+          Cycle Time</button>
+      </div>
+
+      <div fxFlex.gt-md=20 fxFlex.gt-sm="15" fxFlex.gt-xs="10" fxFlex="10">
+        <button mat-raised-button color="warn" class="pull-right" (click)="deleteCycle()"
+          [disabled]="!selection?.selected.length" id="deleteButton">Delete Selected Cycles</button>
+      </div>
+    </div>
+
+    <div class="mat-elevation-z8" style="overflow: auto;">
+      <mat-paginator [pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+      <table mat-table [dataSource]="dataSource" matSort>
+
+        <ng-container matColumnDef="Select">
+          <th   mat-header-cell *matHeaderCellDef style="width:5%">
+            <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()" color="warn"
+              title="Select All">
+            </mat-checkbox>
+          </th>
+          <td   mat-cell *matCellDef="let row" style="width:5%">
+            <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+              [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)" color="warn">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+
+        <ng-container matColumnDef="Id">
+          <th   mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%">Id </th>
+          <td   mat-cell *matCellDef="let element" style="width:5%"> <a (click)="showUpdateForm(element)"
+              style="color:blue;cursor: pointer; text-decoration: underline">{{element.Id}}</a></td>
+        </ng-container>
+        <ng-container matColumnDef="AreaId">
+          <th   mat-header-cell *matHeaderCellDef mat-sort-header style="width:25%">Area </th>
+          <td   mat-cell *matCellDef="let element" style="width:25%">{{element.AreaName}}</td>
+        </ng-container>
+        <ng-container matColumnDef="IsActive">
+          <th   mat-header-cell *matHeaderCellDef mat-sort-header style="width:25%">Status </th>
+          <td   mat-cell *matCellDef="let element" style="width:25%"> {{element.IsActive ?'Active' : 'Inactive'}}</td>
+        </ng-container>
+        <ng-container matColumnDef="ModelId">
+          <th    mat-header-cell *matHeaderCellDef mat-sort-header style="width:25%">Model </th>
+          <td   mat-cell *matCellDef="let element" style="width:25%">{{element.ModelName}}</td>
+        </ng-container>
+        <ng-container matColumnDef="SectionId">
+          <th    mat-header-cell *matHeaderCellDef mat-sort-header style="width:25%">Section </th>
+          <td   mat-cell *matCellDef="let element" style="width:25%">{{element.SectionName}}</td>
+        </ng-container>
+        <ng-container matColumnDef="ComponentId">
+          <th    mat-header-cell *matHeaderCellDef mat-sort-header style="width:25%">Component </th>
+          <td   mat-cell *matCellDef="let element" style="width:25%">{{element.ComponentName}}</td>
+        </ng-container>
+        <ng-container matColumnDef="Value">
+          <th   mat-header-cell *matHeaderCellDef mat-sort-header style="width:5%">Value </th>
+          <td   mat-cell *matCellDef="let element" style="width:5%">{{element.Value}} min</td>
+        </ng-container>
+        
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<div fxLayout="row wrap" *ngIf="isAdd">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Add Cycles Time</mat-card-title>
+        <form #addForm="ngForm" (ngSubmit)="addycle(addForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Area</mat-label>
+                    <mat-select [(ngModel)]="cycle.AreaId" name="AreaName" >
+                      <mat-option *ngFor="let area of AreaList" [value]="area.Id">
+                        {{area.AreaName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Model</mat-label>
+                    <mat-select [(ngModel)]="cycle.ModelId" name="ModelName" >
+                      <mat-option *ngFor="let model of ModelList" [value]="model.Id">
+                        {{model.ModelName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Component</mat-label>
+                    <mat-select [(ngModel)]="cycle.ComponentId" name="ComponentName" >
+                      <mat-option *ngFor="let model of ComponentList" [value]="model.Id">
+                        {{model.ComponentName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="cycle.SectionId" name="SectionName" >
+                      <mat-option *ngFor="let model of SectionList" [value]="model.Id">
+                        {{model.SectionName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <input matInput placeholder="Value" [(ngModel)]="cycle.Value" name="Value" required >
+                    <mat-error>Value required</mat-error>
+                  </mat-form-field>
+                  
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right"
+                    style="margin-left:10px" [disabled]="!addForm.valid">Save</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isAdd = false;isTable = true;getCycle();addForm.resetForm();">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap" *ngIf="isEdit">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Edit Cycles Time</mat-card-title>
+        <form #Editform="ngForm" (ngSubmit)="updateCycle(Editform)" >
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Area</mat-label>
+                    <mat-select [(ngModel)]="update.AreaName" name="AreaName" >
+                      <mat-option *ngFor="let area of AreaList" [value]="area.AreaName">
+                        {{area.AreaName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Model</mat-label>
+                    <mat-select [(ngModel)]="update.ModelName" name="ModelName" >
+                      <mat-option *ngFor="let model of ModelList" [value]="model.ModelName">
+                        {{model.ModelName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Component</mat-label>
+                    <mat-select [(ngModel)]="update.ComponentName" name="ComponentName" >
+                      <mat-option *ngFor="let model of ComponentList" [value]="model.ComponentName">
+                        {{model.ComponentName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="update.SectionName" name="SectionName" >
+                      <mat-option *ngFor="let model of SectionList" [value]="model.SectionName">
+                        {{model.SectionName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field>
+                    <input matInput placeholder="Value" [(ngModel)]="update.Value" name="Value" required >
+                    <mat-error>Value required</mat-error>
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right"
+                    style="margin-left:10px" [disabled]="!Editform.valid">Update</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isEdit = false;isTable = true;getCycle();Editform.resetForm();">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

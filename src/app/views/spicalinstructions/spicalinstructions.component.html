@@ -1,0 +1,315 @@
+<div fxLayout="row wrap" *ngIf="isTable">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <div fxLayout="row wrap">
+          <div fxFlex.gt-sm="50" fxFlex.gt-xs="15" fxFlex="15">
+            <mat-card-title>Special Instructions</mat-card-title>
+          </div>
+          <div fxFlex.gt-sm="30" fxFlex.gt-xs="20" fxFlex="20" class="p-r-20">
+            <mat-form-field>
+              <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+            </mat-form-field>
+          </div>
+          <div fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10" class="p-r-20">
+            <button mat-raised-button color="primary" class="pull-right" (click)="isAdd = true;isTable = false">Add
+              Special Instructions</button>
+          </div> 
+          <div fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10" class="p-r-20">
+            <button mat-raised-button id="button" color="primary" (click)="getSplInstruction()">Get Special Instructions</button>
+          </div>       
+        </div>
+
+        <div fxLayout="row wrap">
+
+          <div fxFlex.gt-md="15" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Section</mat-label>
+              <mat-select [(ngModel)]="procedureObj.SectionName" name="Section" (ngModelChange)=" getAreaList();getModelLists();getVersionLists()"
+                >
+                <mat-option *ngFor="let section of SectionLists" [value]="section">
+                  {{section}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex.gt-md="15" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Area</mat-label>
+              <mat-select [(ngModel)]="procedureObj.AreaName" #select10 name="AreaName" (ngModelChange)="getComponentLists();getVersionLists()"
+                multiple>
+                <div class="select-all" style="margin-left: 6%;">
+                  <mat-checkbox [(ngModel)]="allSelected"
+                                  [ngModelOptions]="{standalone: true}"
+                                  (change)="toggleAllSelection(select10)">Select All</mat-checkbox>
+              </div>
+                <mat-option *ngFor="let area of AreaList" [value]="area">
+                  {{area}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+          </div>
+
+          <div fxFlex.gt-md="15" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Model</mat-label>
+              <mat-select [(ngModel)]="procedureObj.ModelName" name="ModelName" (ngModelChange)="getComponentLists();getVersionLists();"
+                >
+                <mat-option *ngFor="let model of ModelLists" [value]="model">
+                  {{model}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+         
+
+          <div fxFlex.gt-md="15" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Component</mat-label>
+              <mat-select [(ngModel)]="procedureObj.ComponentName" name="ComponentName"
+                (ngModelChange)="getVersionLists();" >
+                <mat-option *ngFor="let component of ComponentLists" [value]="component">
+                  {{component}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+          </div>          
+
+          <div fxFlex.gt-md="15" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Version</mat-label>
+              <mat-select [(ngModel)]="procedureObj.Version" name="Version" >
+                <mat-option *ngFor="let version of versionLists" [value]="version">
+                  {{version}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="mat-elevation-z8" style="overflow: auto;">
+          <mat-paginator [pageSizeOptions]="[10,20,50,100]" [pageSize] ="pageLimit"
+           showFirstLastButtons (page)="refreshPage($event)"></mat-paginator>
+          <table mat-table [dataSource]="dataSource" multiTemplateDataRows>
+            <ng-container matColumnDef="Id">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">Id</th>
+              <td mat-cell *matCellDef="let element" style="width:5%" ><a (click)="showUpdateForm(element)"
+                style="color:blue;cursor: pointer; text-decoration: underline">{{element.Id}} </a></td>
+            </ng-container>
+            <!-- Position Column -->
+            <ng-container matColumnDef="CurrentTimeStamp">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:5%">CurrentTimeStamp</th>
+              <td mat-cell *matCellDef="let element" style="width:5%" >{{element.CurrentTimeStamp}} </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="FileName" >
+              <th mat-header-cell *matHeaderCellDef class="font" style="width:10%"> FileName </th>
+              <td mat-cell *matCellDef="let element" style="width:10%"><a (click)="openImageModal(element)"
+                style="color:blue;cursor: pointer; text-decoration: underline">  {{element.FileName}} </a></td>
+            </ng-container>
+
+           
+              
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+<div fxLayout="row wrap" *ngIf="isAdd">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Add Special Instructions</mat-card-title>
+        <form #addForm="ngForm" (ngSubmit)="addSpclInstr(addForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="procedure.SectionName" (ngModelChange)=" getAreaList();getModelList()" name="SectionName"
+                      required>
+                      <mat-option *ngFor="let section of SectionList" [value]="section">
+                        {{section}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Area</mat-label>
+                    <mat-select [(ngModel)]="procedure.AreaName" #select11 name="AreaName" required
+                      (ngModelChange)="getComponentList()" multiple>
+                      <div class="select-all" style="margin-left: 6%;">
+                        <mat-checkbox [(ngModel)]="allSelected"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="toggleAllSelection(select11)">Select All</mat-checkbox>
+                    </div>
+                      <mat-option *ngFor="let area of AreaList" [value]="area" required>
+                        {{area}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Model</mat-label>
+                    <mat-select [(ngModel)]="procedure.ModelName" name="ModelName" (ngModelChange)="getComponentList()"
+                      required>
+                      <mat-option *ngFor="let model of ModelList" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Component</mat-label>
+                    <mat-select [(ngModel)]="procedure.ComponentName" name="ComponentName" required>
+                      <mat-option *ngFor="let component of ComponentList" [value]="component" required>
+                        {{component}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-label>Image Upload</mat-label><br>
+                  <input type="file" (change)="onFileChanged($event)" accept=".jpg" multiple required>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button type="submit" class="pull-right" id="save" style="margin-left:10px"
+                    color="primary">Save</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isAdd = !isAdd;isTable = true;getSplInstruction();addForm.resetForm();">Cancel</button>
+                    <div *ngIf="isImageUpload" style="margin-left: 50%;margin-top: 2%;">
+                      <mat-spinner></mat-spinner>
+                    </div>
+                </div>
+  
+
+              </div>
+            </div>
+          </div>
+        </form>
+         
+      </mat-card-content>
+      
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap" *ngIf="isEdit">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Edit Special Instructions</mat-card-title>
+        <form #editForm="ngForm" (ngSubmit)="UpdateSpclInstr(editForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="procedure.SectionName" (ngModelChange)="getModelList()" name="SectionName"
+                      required>
+                      <mat-option *ngFor="let section of SectionList" [value]="section">
+                        {{section}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Model</mat-label>
+                    <mat-select [(ngModel)]="procedure.ModelName" name="ModelName" (ngModelChange)="getComponentList()"
+                      required>
+                      <mat-option *ngFor="let model of ModelList" [value]="model">
+                        {{model}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Area</mat-label>
+                    <mat-select [(ngModel)]="procedure.AreaName" #select9 name="AreaName" required
+                      (ngModelChange)="getComponentList()" multiple>
+                      <div class="select-all" style="margin-left: 6%;">
+                        <mat-checkbox [(ngModel)]="allSelected"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="toggleAllSelection(select9)">Select All</mat-checkbox>
+                    </div>
+                      <mat-option *ngFor="let area of AreaList" [value]="area" required>
+                        {{area}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Component</mat-label>
+                    <mat-select [(ngModel)]="procedure.ComponentName" name="ComponentName" required>
+                      <mat-option *ngFor="let component of ComponentList" [value]="component" required>
+                        {{component}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+                <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+                  <mat-form-field>
+                    <input matInput placeholder="Figure Visual" [(ngModel)]="FigureVisual"
+                      name="FigureVisual">
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+                    <input type="file" name="imageFile"  (change)="onImageChange($event)" accept=".jpg" multiple>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button type="submit" class="pull-right" id="save" style="margin-left:10px"
+                    color="primary">Update</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isEdit = !isEdit;isTable = true;getSplInstruction();editForm.resetForm();">Cancel</button>
+                    <div *ngIf="isImageUpload" style="margin-left: 50%;margin-top: 2%;">
+                      <mat-spinner></mat-spinner>
+                    </div>
+                </div>
+  
+
+              </div>
+            </div>
+          </div>
+        </form>
+         
+      </mat-card-content>
+      
+    </mat-card>
+  </div>
+</div>

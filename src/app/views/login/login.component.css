@@ -1,0 +1,5 @@
+.mat-cell {
+    padding: 2px;
+    text-align: left;
+    border-right: 1px solid lightgray;
+}

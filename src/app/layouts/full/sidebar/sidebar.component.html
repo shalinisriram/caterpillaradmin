@@ -1,0 +1,127 @@
+<mat-accordion *ngIf="isOperation">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Operation
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <mat-nav-list>
+        <mat-list-item>
+            <a routerLink="/traceability" routerLinkActive="active">Traceability</a>
+        </mat-list-item>
+        <mat-list-item>
+            <a routerLink="/procedure" routerLinkActive="active">Procedure</a>
+        </mat-list-item>
+        <mat-list-item>
+          <a routerLink="/qualityworkinstruction" routerLinkActive="active">Quality Instruction</a>
+      </mat-list-item>
+      <mat-list-item>
+        <a routerLink="/defects" routerLinkActive="active">Defects</a>
+    </mat-list-item>
+    <mat-list-item>
+      <a routerLink="/spicalinstructions" routerLinkActive="active">Special Instructions</a>
+   </mat-list-item>
+    <mat-list-item>
+      <a routerLink="/auditsequence" routerLinkActive="active">Audit Sequence</a>
+  </mat-list-item>
+   
+        <mat-list-item>
+            <a routerLink="/unit" routerLinkActive="active">Unit</a>
+        </mat-list-item>
+        <mat-list-item>
+          <a routerLink="/schduleunit" routerLinkActive="active">Schedule Unit</a>
+        </mat-list-item>
+        <mat-list-item>
+            <a routerLink="/archive" routerLinkActive="active">Archive</a>
+        </mat-list-item>
+        <mat-list-item>
+                <a routerLink="/plant" routerLinkActive="active">Plant</a>
+            </mat-list-item>
+        <mat-list-item>
+            <a routerLink="/section" routerLinkActive="active">Section</a>
+        </mat-list-item>
+        <mat-list-item>
+            <a routerLink="/area" routerLinkActive="active">Area</a>
+        </mat-list-item>
+        <mat-list-item>
+            <a routerLink="/model" routerLinkActive="active">Model</a>
+        </mat-list-item>
+        <mat-list-item>
+            <a routerLink="/component" routerLinkActive="active">Component</a>
+        </mat-list-item>
+        <mat-list-item>
+          <a routerLink="/cycleTime" routerLinkActive="active">Cycle Time</a>
+      </mat-list-item>
+        <mat-list-item>
+            <a routerLink="/user" routerLinkActive="active">User</a>
+        </mat-list-item>
+        <mat-list-item>
+          <a routerLink="/station" routerLinkActive="active">Stations</a>
+      </mat-list-item>
+        <mat-list-item>
+            <a routerLink="/break" routerLinkActive="active">Break</a>
+        </mat-list-item>
+        <mat-list-item>
+            <a routerLink="/settings" routerLinkActive="active">Settings</a>
+        </mat-list-item>
+        <!-- <mat-list-item>
+            <a routerLink="/filetransfer" routerLinkActive="active">File Transfer</a>
+        </mat-list-item> -->
+    </mat-nav-list>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <mat-accordion *ngIf="isEcm">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          ECM Management
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <!-- <mat-nav-list>
+        <mat-list-item>
+          <mat-accordion>
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon>all_inbox</mat-icon> Inbox
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <mat-list> -->
+                <mat-nav-list>
+                <mat-list-item > 
+                  <a routerLink="/inbox" routerLinkActive="active"><mat-icon>create</mat-icon>ECN Creation</a>
+                </mat-list-item>
+                <mat-list-item >
+                  <a routerLink="/routingecns" routerLinkActive="active"><mat-icon>pending_actions</mat-icon>Workflow Action</a>
+                </mat-list-item>
+                </mat-nav-list>
+              <!-- </mat-list> -->
+            <!-- </mat-expansion-panel>
+          </mat-accordion> -->
+        <!-- </mat-list-item>
+      </mat-nav-list> -->
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <mat-accordion *ngIf="isEcm">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+         Admin ECM
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+        <mat-nav-list>
+        <mat-list-item>
+            <a routerLink="/ecmprocess" routerLinkActive="active">Process</a>
+        </mat-list-item>
+        <mat-list-item>
+            <a routerLink="/ecmdepartment" routerLinkActive="active">Department</a>
+        </mat-list-item>
+        <mat-list-item>
+            <a routerLink="/ecmchecklist" routerLinkActive="active">CheckList</a>
+        </mat-list-item>
+    </mat-nav-list>
+    </mat-expansion-panel>
+  </mat-accordion>
+

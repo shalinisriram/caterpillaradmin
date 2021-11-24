@@ -1,0 +1,128 @@
+<mat-card *ngIf="isTable">
+  <mat-card-content>
+    <div fxLayout="row wrap">
+      <div fxFlex.gt-md=50 fxFLex.gt-sm=50 fxFlex.gt-xs=50 fxFlex=50>
+        <mat-card-title>Plants</mat-card-title>
+      </div>
+      <div fxFlex.gt-md=20 fxFLex.gt-sm=40 fxFlex.gt-xs=40 fxFlex=40>
+        <mat-form-field>
+          <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+        </mat-form-field>
+      </div>
+      <div fxFlex.gt-md=12 fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10">
+        <button mat-raised-button color="primary" class="pull-right" (click)="isAdd = true;isTable = false;">Add
+          Plant</button>
+      </div>
+
+      <div fxFlex.gt-md=18 fxFlex.gt-sm="15" fxFlex.gt-xs="10" fxFlex="10">
+        <button mat-raised-button color="warn" class="pull-right" (click)="deletePlants()"
+          [disabled]="!selection?.selected.length" id="deleteButton">Delete Selected Plants</button>
+      </div>
+    </div>
+
+    <div class="mat-elevation-z8" style="overflow: auto;">
+      <mat-paginator [pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+      <table mat-table [dataSource]="dataSource" matSort>
+
+        <ng-container matColumnDef="Select">
+          <th mat-header-cell *matHeaderCellDef style="width:auto">
+            <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()" color="warn"
+              title="Select All">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row" style="width:auto">
+            <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+              [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)" color="warn">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+
+        <ng-container matColumnDef="PlantName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:auto">Plant </th>
+          <td mat-cell *matCellDef="let element" style="width:auto"> <a (click)="showUpdateForm(element)"
+              style="color:blue;cursor: pointer; text-decoration: underline">{{element.PlantName}}</a></td>
+        </ng-container>
+        <ng-container matColumnDef="FacilitatorCode"> 
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:auto">Facilitator Code </th>
+          <td mat-cell *matCellDef="let element"style="width:auto">{{element.Fac}}</td>
+        </ng-container>
+        <ng-container matColumnDef="IsActive">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="width:auto">Status </th>
+          <td mat-cell *matCellDef="let element" style="width:auto"> {{element.IsActive ?'Active' : 'Inactive'}}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<div fxLayout="row wrap" *ngIf="isAdd">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Add Plant</mat-card-title>
+        <form #addForm="ngForm" (ngSubmit)="addPlant(addForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Plant Name" [(ngModel)]="plant.PlantName" name="PlantName" required >
+                    <mat-error>PlantName required</mat-error>
+                  </mat-form-field>
+                  <mat-form-field>
+                    <input matInput placeholder="Facilitator Code" [(ngModel)]="plant.Fac" name="Fac">
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right"
+                    style="margin-left:10px" [disabled]="!addForm.valid">Save</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isAdd = false;isTable = true;getPlants();addForm.resetForm();">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap" *ngIf="isEdit">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Edit Plant</mat-card-title>
+        <form #Editform="ngForm" (ngSubmit)="updatePlant(Editform)" >
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Plant Name" [(ngModel)]="plant.PlantName" name="PlantName">
+                  
+                  </mat-form-field>
+                  <mat-form-field>
+                    <input matInput placeholder="Facilitator Code" [(ngModel)]="plant.Fac" name="Fac">
+                    
+                  </mat-form-field>
+                </div>
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right"
+                    style="margin-left:10px" [disabled]="!Editform.valid">Update</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isEdit = false;isTable = true;getPlants();Editform.resetForm();">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

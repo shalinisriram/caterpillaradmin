@@ -1,0 +1,451 @@
+<div fxLayout="row wrap" *ngIf="isTable">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <div fxLayout="row wrap">
+          <div fxFlex.gt-md="50" fxFlex.gt-sm="55" fxFlex.gt-xs="15" fxFlex="15">
+            <mat-card-title>Users</mat-card-title>
+          </div>
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="20" fxFlex.gt-xs="20" fxFlex="20">
+            <mat-form-field>
+              <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Search">
+            </mat-form-field>
+          </div>
+          <div fxFlex.gt-md="10" fxFlex.gt-sm="10" fxFlex.gt-xs="10" fxFlex="10">
+            <button mat-raised-button color="primary" class="pull-right" (click)="isAdd = true;isTable = false">Add
+              User</button>
+          </div>
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="15" fxFlex.gt-xs="10" fxFlex="10">
+            <button mat-raised-button color="warn" class="pull-right" (click)="deleteUsers()"
+              [disabled]="!selection?.selected.length" id="deleteButton">Delete Selected Users</button>
+          </div>
+        </div>
+        <div fxLayout="row wrap">
+
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Section</mat-label>
+              <mat-select [(ngModel)]="getUserFilter.Section" name="Section" (ngModelChange)="getUsers();getAreasFiltewr()"
+                multiple>
+                <mat-option *ngFor="let section of sectionList" [value]="section">
+                  {{section}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Department</mat-label>
+              <mat-select [(ngModel)]="getUserFilter.Department" name="Department" (ngModelChange)="getUsers()"
+                multiple>
+                <mat-option *ngFor="let Department of departmentList" [value]="Department.DepartmentName">
+                  {{Department.DepartmentName}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Process</mat-label>
+              <mat-select [(ngModel)]="getUserFilter.Process" name="Process"  (ngModelChange)="getUsers()" multiple>
+                <mat-option *ngFor="let Process of processList" [value]="Process">
+                  {{Process}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div fxFlex.gt-md="20" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+            <mat-form-field class="p-r-10">
+              <mat-label>Area</mat-label>
+              <mat-select [(ngModel)]="getUserFilter.Areas" name="AreaName" (ngModelChange)="getUsers()"
+                multiple>
+                <mat-option *ngFor="let area of areaList" [value]="area">
+                  {{area}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+          </div>
+        </div>
+
+        <div class="mat-elevation-z8">
+          <mat-paginator [pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+          <table mat-table [dataSource]="dataSource" matSort>
+            <ng-container matColumnDef="Select">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+                  [checked]="selection.hasValue() && isAllSelected()"
+                  [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()" color="warn"
+                  title="Select All">
+                </mat-checkbox>
+              </th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                  [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)" color="warn">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="UserName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="font" style="width: 10%">User</th>
+              <td mat-cell *matCellDef="let element"><a (click)="showUpdateForm(element)"
+                  style="text-decoration: underline;color: blue; cursor: pointer;">{{element.UserName}}</a></td>
+            </ng-container>
+
+            <!-- <ng-container matColumnDef="Password">
+              <th mat-header-cell *matHeaderCellDef class="font">Password</th>
+              <td mat-cell *matCellDef="let element">{{element.Password}}</td>
+            </ng-container> -->
+
+            <ng-container matColumnDef="RoleType">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="font"  style="width: 10%">Role Type</th>
+              <td mat-cell *matCellDef="let element">{{element.RoleType}}</td>
+            </ng-container>
+
+             <ng-container matColumnDef="Department">
+              <th mat-header-cell *matHeaderCellDef class="font"  style="width: 10%"> Department </th>
+              <td mat-cell *matCellDef="let element"> {{element.Department?.DepartmentName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Section">
+              <th mat-header-cell *matHeaderCellDef class="font" style="width: 10%"> Section </th>
+              <td mat-cell *matCellDef="let element"> {{element.Section}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Area">
+              <th mat-header-cell *matHeaderCellDef class="font"  style="width: 10%"> Area </th>
+              <td mat-cell *matCellDef="let element"> {{element.Area}} </td>
+            </ng-container>
+            <!-- <ng-container matColumnDef="loginGroups">
+              <th mat-header-cell *matHeaderCellDef class="font"> Groups </th>
+              <td mat-cell *matCellDef="let element">
+                <div *ngFor="let elem of element.loginGroups">
+                  {{elem.GroupName}}
+                </div> </td>
+            </ng-container> -->
+
+            <ng-container matColumnDef="Process">
+              <th mat-header-cell *matHeaderCellDef class="font"  style="width: 10%">Process</th>
+              <td mat-cell *matCellDef="let element" >
+                <span *ngFor = "let item of element.loginDepts">
+                  {{item.ProcessName}},
+                </span>  </td>
+            </ng-container>
+
+            <ng-container matColumnDef="Permission">
+              <th mat-header-cell *matHeaderCellDef class="font"  style="width: 10%"> Permission </th>
+              <td mat-cell *matCellDef="let element">
+                <span *ngFor = "let item of element.loginPermission">
+                  {{item.PermissionName}},
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="IsActive">
+              <th mat-header-cell *matHeaderCellDef class="font"  style="width: 10%"> Status </th>
+              <td mat-cell *matCellDef="let element"> {{element.IsActive?'Active':'Inactive'}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="ResetPassword">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header  style="width: 10%">Password Reset</th>
+              <td mat-cell *matCellDef="let element">
+                <i class="material-icons" (click)="ResetPassword(element)"
+                   title="resetpassword" style="color: green; cursor:pointer">
+                   refresh
+                </i>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap" *ngIf="isAdd">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Add User</mat-card-title>
+        <form #addForm="ngForm" (ngSubmit)="addUser(addForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="User Name" [(ngModel)]="user.UserName" name="UserName" required>
+                    <mat-error>UserName required</mat-error>
+                  </mat-form-field>
+
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Password" [(ngModel)]="user.Password" name="Password" required>
+                    <mat-error>Password required</mat-error>
+                  </mat-form-field>
+
+                </div>
+
+                 <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Department</mat-label>
+                    <mat-select [(ngModel)]="SelectedDepartmentName" name="Department">
+                      <mat-option *ngFor="let Department of departmentList" [value]="Department?.DepartmentName">
+                        {{Department.DepartmentName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Role</mat-label>
+                    <mat-select [(ngModel)]="user.RoleType" name="Role">
+                      <mat-option *ngFor="let role of roleList" [value]="role">
+                        {{role}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="user.Section" name="section"  (ngModelChange)=" getAreas()" #select  multiple>
+                      <div class="select-all">
+                        <mat-checkbox [(ngModel)]="allSelected"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="toggleAllSelection(select)">Select All</mat-checkbox>
+                    </div>
+                      <mat-option *ngFor="let section of sectionList" [value]="section">
+                        {{section}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Area</mat-label>
+                    <mat-select [(ngModel)]="user.Area" name="Area" #select1  multiple>
+                      <div class="select-all">
+                        <mat-checkbox [(ngModel)]="allSelected"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="toggleAllSelection(select1)">Select All</mat-checkbox>
+                    </div>
+                      <mat-option *ngFor="let area of areaList" [value]="area">
+                        {{area}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <!-- <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Groups</mat-label>
+                    <mat-select [(ngModel)]="user.Groups" name="Groups" multiple>
+                      <mat-option *ngFor="let group of groupList" [value]="group.GroupName">
+                        {{group.GroupName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div> -->
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Process</mat-label>
+                    <mat-select [(ngModel)]="user.Process" #select2 name="Process" multiple>
+                      <div class="select-all">
+                        <mat-checkbox [(ngModel)]="allSelected"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="toggleAllSelection(select2)">Select All</mat-checkbox>
+                    </div>
+                      <mat-option *ngFor="let item of processList" [value]="item">
+                        {{item}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Permission</mat-label>
+                    <mat-select [(ngModel)]="user.Permission" #select3 name="Permission" multiple>
+                      <div class="select-all">
+                        <mat-checkbox [(ngModel)]="allSelected"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="toggleAllSelection(select3)">Select All</mat-checkbox>
+                    </div>
+                      <mat-option *ngFor="let item of permissionlist" [value]="item">
+                        {{item}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right"
+                    style="margin-left:10px" [disabled]="!addForm.valid">Save</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isAdd = false;isTable = true;getUsers();addForm.resetForm()">Cancel</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div fxLayout="row wrap" *ngIf="isEdit">
+  <div fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+    <mat-card>
+      <mat-card-content>
+        <mat-card-title>Edit User</mat-card-title>
+        <form #EditForm="ngForm" (ngSubmit)="updateUser(EditForm)">
+          <div fxLayout="row wrap">
+            <div fxFlex.gt-md="50" fxFlex.gt-sm="50" fxFlex.gt-xs="50" fxFlex="50">
+              <div fxLayout="row wrap">
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="User Name" [(ngModel)]="user.UserName" name="UserName">
+                  </mat-form-field>
+                  <small *ngIf="form.controls['UserName'].hasError('required') && form.controls['UserName'].touched"
+                    class="text-danger support-text">UserName is required.</small>
+                </div>
+
+                <!-- <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <input matInput placeholder="Password" [(ngModel)]="user.Password" name="Password">
+                  </mat-form-field>
+                  <small *ngIf="form.controls['Password'].hasError('required') && form.controls['Password'].touched"
+                    class="text-danger support-text">Password is required.</small>
+                </div> -->
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field>
+                    <mat-label>Role</mat-label>
+                    <mat-select [(ngModel)]="user.RoleType" name="Role">
+                      <mat-option *ngFor="let role of roleList" [value]="role">
+                        {{role}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <small *ngIf="form.controls['RoleType'].hasError('required') && form.controls['RoleType'].touched"
+                    class="text-danger support-text">RoleType is required.</small>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100" class="m-b-10">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Department</mat-label>
+                    <mat-select name="Department"  [(ngModel)]="SelectedDepartmentName" >
+                      <mat-option *ngFor="let Department of departmentList" [value]="Department?.DepartmentName">
+                        {{Department.DepartmentName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100" class="m-b-10">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Section</mat-label>
+                    <mat-select [(ngModel)]="user.Section" #select name="section" (ngModelChange)=" getAreas()" multiple>
+                      <div class="select-all">
+                        <mat-checkbox [(ngModel)]="allSelected"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="toggleAllSelection(select)">Select All</mat-checkbox>
+                    </div>
+                      <mat-option *ngFor="let section of sectionList" [value]="section">
+                        {{section}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Area</mat-label>
+                    <mat-select [(ngModel)]="user.Area" #select1 name="Area" multiple>
+                      <div class="select-all">
+                        <mat-checkbox [(ngModel)]="allSelected"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="toggleAllSelection(select1)">Select All</mat-checkbox>
+                    </div>
+                      <mat-option *ngFor="let area of areaList" [value]="area">
+                        {{area}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <!-- <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Groups</mat-label>
+                    <mat-select [(ngModel)]="user.Groups" name="Groups" multiple>
+                      <mat-option *ngFor="let group of groupList" [value]="group.GroupName">
+                        {{group.GroupName}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div> -->
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Process</mat-label>
+                    <mat-select [(ngModel)]="user.Process" #select2 name="Process" multiple>
+                      <div class="select-all">
+                        <mat-checkbox [(ngModel)]="allSelected"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="toggleAllSelection(select2)">Select All</mat-checkbox>
+                    </div>
+                      <mat-option *ngFor="let area of processList" [value]="area">
+                        {{area}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <mat-form-field class="p-r-10">
+                    <mat-label>Permission</mat-label>
+                    <mat-select [(ngModel)]="user.Permission" #select3 name="Permission" multiple>
+                      <div class="select-all">
+                        <mat-checkbox [(ngModel)]="allSelected"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (change)="toggleAllSelection(select3)">Select All</mat-checkbox>
+                    </div>
+                      <mat-option *ngFor="let item of permissionlist" [value]="item">
+                        {{item}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+
+                <div fxFlex.gt-md="100" fxFlex.gt-sm="100" fxFlex.gt-xs="100" fxFlex="100">
+                  <button mat-raised-button color="primary" type="submit" class="pull-right"
+                    style="margin-left:10px">Update</button>
+                  <button mat-raised-button color="warn" class="pull-right"
+                    (click)="isEdit = false;isTable = true;getUsers(); EditForm.resetForm()">Cancel</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
